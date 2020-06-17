@@ -17,8 +17,7 @@ fi
 
 #export FORECASTSH="$HOMEgfs/scripts/exglobal_fcst_nemsfv3gfs.sh"
 #export FORECASTSH="$HOMEgfs/scripts/exglobal_fcst_nemsfv3gfs_gsdchem.sh"
-export FORECASTSH="$HOMEgfs/scripts/exglobal_fcst_nemsfv3gfs_v8.8.sh"
-export FORECASTSH="$HOMEgfs/scripts/exglobal_fcst_nemsfv3gfs_gsdchem.sh"
+export FORECASTSH="$HOMEgfs/scripts/exglobal_fcst_nemsfv3gfs_gsdchem_v9.0.sh"
 export FCSTEXECDIR="$HOMEgfs/exec"
 #export FCSTEXEC="fv3_gfs_nh.prod.32bit.x" !lzhang
 export FCSTEXEC="global_gsdchem_ms090_hbo_newTest.x"
