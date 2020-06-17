@@ -1,1 +1,0 @@
-../sorc/ufs_utils.fd/exec/nst_tf_chg.x

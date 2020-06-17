@@ -1,1 +1,0 @@
-../sorc/gsi.fd/exec/global_gsi.x

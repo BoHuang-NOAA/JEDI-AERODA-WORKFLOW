@@ -1,1 +1,0 @@
-../sorc/fv3gfs.fd/NEMS/exe/global_fv3gfs.x

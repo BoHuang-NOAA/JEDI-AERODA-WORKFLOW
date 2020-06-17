@@ -1,1 +1,0 @@
-../sorc/gsi.fd/exec/radmon_bcor.x
