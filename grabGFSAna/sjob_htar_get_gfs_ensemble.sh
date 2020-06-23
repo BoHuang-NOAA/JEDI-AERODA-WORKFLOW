@@ -24,7 +24,7 @@ heraTmp=${heraTop}/tmp
 dateS=2016060600
 dateE=2016060918
 dateInc=6
-incdate=/scratch1/BMC/gsd-fv3-dev/MAPP_2018/bhuang/JEDI-2020/JEDI-FV3/expCodes/GSDChem_cycling/global-workflow-clean/incdate.sh
+incdate=/scratch2/NCEPDEV/nwprod/NCEPLIBS/utils/prod_util.v1.1.0/exec/ndate
 
 nanal=40
 
@@ -78,7 +78,7 @@ if [[ $? -eq  0 ]]; then
        exit $status
     fi
 
-    dateL=`${incdate} ${dateL} ${dateInc}`
+    dateL=`${incdate} ${dateInc} ${dateL}`
 else
     exit $?
 fi

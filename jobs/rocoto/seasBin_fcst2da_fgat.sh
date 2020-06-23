@@ -61,23 +61,19 @@ export ERRSCRIPT=${ERRSCRIPT:-'eval [[ $err = 0 ]]'}
 # other variables
 ntiles=${ntiles:-6}
 
-export DATA=${DATA}/grp${ENSGRP}
-
-mkdir -p $DATA && cd $DATA/
-
 # do ensemble mean first
 if [ $NMEM_AERO -gt 0 ]; then
 if [ ${ENSGRP} -eq 1 ]; then
   export imem="0"
   for n in $(seq 1 6); do
     export itile=$n
-    $JEDIUSH/run_seasBin_da2fcst.sh
+    $JEDIUSH/run_seasBin_fcst2da_fgat.sh
   done
 
   export imem="-1"
   for n in $(seq 1 6); do
     export itile=$n
-    $JEDIUSH/run_seasBin_da2fcst.sh
+    $JEDIUSH/run_seasBin_fcst2da_fgat.sh
   done
 fi
 fi
@@ -90,8 +86,8 @@ if [ $NMEM_AERO -gt 0 ]; then
     export imem=$mem0
     # need to generate files for each tile 1-6
     for n in $(seq 1 6); do
-        export itile=$n
-	$JEDIUSH/run_seasBin_da2fcst.sh
+	export itile=$n
+	$JEDIUSH/run_seasBin_fcst2da_fgat.sh
     done
     err=$?
   done

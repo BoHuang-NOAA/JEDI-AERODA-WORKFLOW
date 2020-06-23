@@ -46,7 +46,7 @@ export MEANEXECDIR=${MEANEXECDIR:-$HOMEgfs/exec/}
 CDATE=${CDATE:-"2001010100"}
 CDUMP=${CDUMP:-"gdas"}
 GDUMP=${GDUMP:-"gdas"}
-export CASE=${CASE:-"C96"}
+export CASE=${CASE_ENKF:-"C96"}
 export nlevs=${nlevs:-64}
 
 

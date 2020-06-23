@@ -1104,7 +1104,7 @@ if [ $SEND = "YES" ]; then
     cd $DATA/RESTART
     mkdir -p $memdir/RESTART
 
-    if [ $FGAT3D = "TRUE" -a ${FGAT3D_onlyCenter} != "True" ]; then
+    if [ $FGAT3D = "TRUE" -a ${FGAT3D_onlyCenter} != "TRUE" ]; then
     #RDATE=$($NDATE +$restart_interval $CDATE)
     RDATE=$($NDATE +$assim_freq $CDATE)
     RDATEM3=$($NDATE -$assim_freq_half $RDATE)

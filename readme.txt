@@ -37,6 +37,8 @@ assimilation on Hera machine
 	(3.1) global-workflow-clean/GFSNEMS2NC
 	(3.2) Since GFS NEMSIO analysis files in (2) may have different names that vary with analysis time, modify 
 	      accordingly in the python script. 
+	(3.3) After running nems2nc_jediaero_met.sh, the generated files are organized as ${ICDIR}/$CDATE/control (ensemble) 
+	      ($CDATE is the analysis cycle, ${ICDIR} defined in dr-work-modis/*.xml).
 
 (4) Workflow for model spin-up and DA cycling
 	(4.1) global-workflow-clean/dr-work-modis for assimilation of MODIS AOD obs from aqua and terra satellites.

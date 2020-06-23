@@ -50,7 +50,7 @@ export JEDIUSH=${JEDIUSH:-$HOMEgfs/ush/JEDI/}
 CDATE=${CDATE:-"2001010100"}
 CDUMP=${CDUMP:-"gdas"}
 GDUMP=${GDUMP:-"gdas"}
-export CASE=${CASE:-"C96"}
+export CASE=${CASE_ENKF:-"C96"}
 
 
 # Derived base variables
@@ -66,9 +66,6 @@ export NCP=${NCP:-"/bin/cp"}
 export NMV=${NMV:-"/bin/mv"}
 export NLN=${NLN:-"/bin/ln -sf"}
 export ERRSCRIPT=${ERRSCRIPT:-'eval [[ $err = 0 ]]'}
-
-# Link executable
-HOFXFGATEXEC=${HOMEgfs}/exec/fv3jedi_hofx_nomodel.x
 
 # other variables
 ntiles=${ntiles:-6}
@@ -87,18 +84,33 @@ module load jedi-stack/intel-impi-18.0.5
 export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/scratch1/BMC/gsd-fv3-dev/MAPP_2018/pagowski/jedi/build/fv3-bundle/lib"
 export NDATE=${ndate1}
 
+# do ensemble mean
+if [ ${ENSGRP} -eq 1 ]; then
+   export imem="0"
+   $JEDIUSH/enkf_hofx_AOD_modis_fgat.sh
+   err=$?
+   if [ $err != 0 ]; then
+      exit $err
+   fi
+
+   export imem="-1"
+   $JEDIUSH/enkf_hofx_AOD_modis_fgat.sh
+   err=$?
+   if [ $err != 0 ]; then
+      exit $err
+   fi
+fi
+
 ###############################################################
 # need to loop through ensemble members if necessary
 if [ $NMEM_AERO -gt 0 ]; then
   for mem0 in {${ENSBEG}..${ENSEND}}; do
     export imem=$mem0
     $JEDIUSH/enkf_hofx_AOD_modis_fgat.sh
-
-    srun --export=all -n 6 ${HOFXFGATEXEC} "enkf_hofx_AOD_modis_fgat.yaml" "$DATA/enkf_hofx_AOD_modis_fgat_mem${imem}.run"
-err=$?
-
   done
 fi
+
+err=$?
 
 ###############################################################
 # Postprocessing

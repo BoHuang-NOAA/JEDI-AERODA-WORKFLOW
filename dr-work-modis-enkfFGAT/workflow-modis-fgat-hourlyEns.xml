@@ -14,9 +14,9 @@
 	-->
 
 	<!-- Experiment parameters such as name, starting, ending dates -->
-	<!ENTITY PSLOT "jedi-3denvar-aeroDA-modis">
-	<!ENTITY SDATE "201605311800">
-	<!ENTITY EDATE "201606040000">
+	<!ENTITY PSLOT "workflow-modis-fgat-hourlyEns">
+	<!ENTITY SDATE "201606010000">
+	<!ENTITY EDATE "201606011800">
 
 	<!-- Run Envrionment -->
 	<!ENTITY RUN_ENVIR "emc">
@@ -24,7 +24,7 @@
 	<!ENTITY HPSS_PROJECT "fim">
 
 	<!-- Experiment top run directory-->
-	<!ENTITY TOPRUNDIR "/scratch1/BMC/gsd-fv3-dev/MAPP_2018/bhuang/JEDI-2020/JEDI-FV3/expRuns"> 
+	<!ENTITY TOPRUNDIR "/scratch2/BMC/gsd-fv3-dev/MAPP_2018/bhuang/JEDI-2020/JEDI-FV3/expRuns"> 
 	<!ENTITY TOPICDIR "/scratch1/BMC/gsd-fv3-dev/MAPP_2018/bhuang/JEDI-2020/JEDI-FV3/dataSets">
 	<!--ENTITY TOPOBSDIR "/scratch1/BMC/wrf-chem/pagowski/MAPP_2018/OBS/VIIRS/AOT/thinned_"-->
 	<!ENTITY TOPOBSDIR  "/scratch1/BMC/gsd-fv3-dev/MAPP_2018/bhuang/JEDI-2020/JEDI-FV3/dataSets/NNR_AOD_Obs/2016Case/thinned_C192/">
@@ -106,7 +106,7 @@
 	<!ENTITY NATIVE_ARCH_GDAS    "--export=NONE">
 
 	<!ENTITY QUEUE_EFCS_GDAS     "&QUEUE;">
-	<!ENTITY WALLTIME_EFCS_GDAS  "00:59:00">
+	<!ENTITY WALLTIME_EFCS_GDAS  "00:29:00">
 	<!ENTITY RESOURCES_EFCS_GDAS "<nodes>5:ppn=24:tpp=1</nodes>">
 	<!ENTITY NATIVE_EFCS_GDAS    "--export=NONE">
 
@@ -389,7 +389,7 @@
 
 <task name="gdaseupd" cycledefs="gdas" maxtries="&MAXTRIES;">
 
-	<command>&JOBS_DIR;/eupd.sh</command>
+	<command>&JOBS_DIR;/eupd_fgat.sh</command>
 
 	<jobname><cyclestr>&PSLOT;_gdaseupd_@H</cyclestr></jobname>
 	<account>&ACCOUNT;</account>
@@ -502,7 +502,7 @@
 
 	<task name="seasbinda2fcst#grp#" cycledefs="ens" maxtries="&MAXTRIES;">
 
-		<command>&JOBS_DIR;/seasBin_da2fcst.sh</command>
+		<command>&JOBS_DIR;/seasBin_da2fcst_fgat.sh</command>
 
 		<jobname><cyclestr>&PSLOT;_seasbinda2fcst#grp#_@H</cyclestr></jobname>
 		<account>&ACCOUNT;</account>
@@ -629,7 +629,7 @@
 
 <task name="gdasemean" cycledefs="gdas" maxtries="&MAXTRIES;">
 
-	<command>&JOBS_DIR;/ensmeanbckg.sh</command>
+	<command>&JOBS_DIR;/ensmeanbckg_fgat.sh</command>
 
 	<jobname><cyclestr>&PSLOT;_gdasemean_@H</cyclestr></jobname>
 	<account>&ACCOUNT;</account>
@@ -668,7 +668,7 @@
 
 	<task name="seasbinfcst2da#grp#" cycledefs="ens" maxtries="&MAXTRIES;">
 
-		<command>&JOBS_DIR;/seasBin_fcst2da.sh</command>
+		<command>&JOBS_DIR;/seasBin_fcst2da_fgat.sh</command>
 
 		<jobname><cyclestr>&PSLOT;_seasbinfcst2da#grp#_@H</cyclestr></jobname>
 		<account>&ACCOUNT;</account>
@@ -701,10 +701,6 @@
 		</dependency>
 	</task>	
 </metatask>
-
-
-
-
 
 <metatask name="gdashxaod">
 
@@ -746,6 +742,46 @@
 	</task>	
 </metatask>
 
+<metatask name="gdashxaodfgat">
+
+	<var name="grp">01 02 03 04 05</var>
+
+	<task name="gdashxaodfgat#grp#" cycledefs="ens" maxtries="&MAXTRIES;">
+
+		<command>&JOBS_DIR;/enshxaodbckg_AOD_modis_fgat.sh</command>
+
+		<jobname><cyclestr>&PSLOT;_gdashxaodfgat#grp#_@H</cyclestr></jobname>
+		<account>&ACCOUNT;</account>
+		<queue>&QUEUE_HXAOD_GDAS;</queue>
+		&RESOURCES_HXAOD_GDAS;
+		<walltime>&WALLTIME_HXAOD_GDAS;</walltime>
+	
+		<native>&NATIVE_HXAOD_GDAS;</native>
+
+		<join><cyclestr>&ROTDIR;/logs/@Y@m@d@H/gdashxaodfgat#grp#.log</cyclestr></join>
+
+		<envar><name>SLURM_SET</name><value>YES</value></envar>
+		<envar><name>PSLOT</name><value>&PSLOT;</value></envar>
+		<envar><name>RUN_ENVIR</name><value>&RUN_ENVIR;</value></envar>
+		<envar><name>TOPOBSDIR</name><value>&TOPOBSDIR;</value></envar>
+		<envar><name>HOMEgfs</name><value>&HOMEgfs;</value></envar>
+		<envar><name>HOMEjedi</name><value>&HOMEjedi;</value></envar>
+		<envar><name>EXPDIR</name><value>&EXPDIR;</value></envar>
+		<envar><name>ROTDIR</name><value>&ROTDIR;</value></envar>
+		<envar><name>CDATE</name><value><cyclestr>@Y@m@d@H</cyclestr></value></envar>
+		<envar><name>CDUMP</name><value>gdas</value></envar>
+		<envar><name>RUN_ENVIR</name><value>&RUN_ENVIR;</value></envar>
+		<envar><name>machine</name><value>&machine;</value></envar>
+		<envar><name>HPSS_PROJECT</name><value>&HPSS_PROJECT;</value></envar>
+		<envar><name>PDY</name><value><cyclestr>@Y@m@d</cyclestr></value></envar>
+		<envar><name>cyc</name><value><cyclestr>@H</cyclestr></value></envar>
+		<envar><name>ENSGRP</name><value>#grp#</value></envar>
+		<dependency>
+			<metataskdep metatask="gdashxaod"/>
+		</dependency>
+	</task>	
+</metatask>
+
 
 
 <task name="cleandata" cycledefs="gdas" maxtries="&MAXTRIES;">
@@ -780,6 +816,7 @@
 		<and>
 			<!--taskdep task="gdashxaodanl"/-->
 			<metataskdep metatask="gdashxaod"/>
+			<metataskdep metatask="gdashxaodfgat"/>
 		</and>
 	</dependency>
 </task>

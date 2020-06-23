@@ -9,7 +9,8 @@ enddate = datetime.datetime(2016,6,9,18)
 execcnvt = '/scratch1/BMC/gsd-fv3-dev/MAPP_2018/bhuang/JEDI-2020/JEDI-FV3/expCodes/GSDChem_cycling/global-workflow-clean/exec//nemsioatm2nc'
 # NEMSIO file directory downloaded from grabGFSAna
 nemsDir = '/scratch1/BMC/chem-var/MAPP_2018/bhuang/JEDI-2020/JEDI-FV3/dataSets/GFSSigio/'
-ncDir = '/scratch1/BMC/chem-var/MAPP_2018/bhuang/JEDI-2020/JEDI-FV3/dataSets/GFSNetCDF/'
+#ncDir = '/scratch1/BMC/chem-var/MAPP_2018/bhuang/JEDI-2020/JEDI-FV3/dataSets/GFSNetCDF/'
+ncDir = '/scratch1/BMC/gsd-fv3-dev/MAPP_2018/bhuang/JEDI-2020/JEDI-FV3/dataSets/ICs/L64/'
 RootMP=nemsDir
 RootMe=ncDir
 
@@ -32,9 +33,11 @@ while nowdate <= enddate:
   infiles.append(RootMP+'/control/'+nowdate.strftime('%Y%m%d%H')+
                  #'/gdas.t'+nowdate.strftime('%H')+'z.atmanl.nemsio') 
                  '/gfnanl.gdas.'+nowdate.strftime('%Y%m%d%H')) 
-  outfiles.append(RootMe+'/control/'+nowdate.strftime('%Y%m%d%H')+'/gdas.t'+nowdate.strftime('%H')+'z.atmanl.nc') 
+  #outfiles.append(RootMe+'/control/'+nowdate.strftime('%Y%m%d%H')+'/gdas.t'+nowdate.strftime('%H')+'z.atmanl.nc') 
+  outfiles.append(RootMe+'/'+nowdate.strftime('%Y%m%d%H')+'/control/gdas.t'+nowdate.strftime('%H')+'z.atmanl.nc') 
   try:
-    os.makedirs(RootMe+'/control/'+nowdate.strftime('%Y%m%d%H')+'/')
+    #os.makedirs(RootMe+'/control/'+nowdate.strftime('%Y%m%d%H')+'/')
+    os.makedirs(RootMe+'/'+nowdate.strftime('%Y%m%d%H')+'/control/')
   except:
     pass
   for mem in range(1,nmems+1):
@@ -43,9 +46,11 @@ while nowdate <= enddate:
     infiles.append(RootMP+'/ensemble/'+nowdate.strftime('%Y%m%d%H')+'/'+memstr+
                    #'/gdas.t'+nowdate.strftime('%H')+'z.ratmanl.'+memstr+'.nemsio')
                     '/siganl_'+nowdate.strftime('%Y%m%d%H') + '_' + memstr) 
-    outfiles.append(RootMe+'/ensemble/'+nowdate.strftime('%Y%m%d%H')+'/'+memstr+'/gdas.t'+nowdate.strftime('%H')+'z.atmanl.nc') 
+    #outfiles.append(RootMe+'/ensemble/'+nowdate.strftime('%Y%m%d%H')+'/'+memstr+'/gdas.t'+nowdate.strftime('%H')+'z.atmanl.nc') 
+    outfiles.append(RootMe+'/'+nowdate.strftime('%Y%m%d%H')+'/ensemble/'+memstr+'/gdas.t'+nowdate.strftime('%H')+'z.atmanl.nc') 
     try:
-      os.makedirs(RootMe+'/ensemble/'+nowdate.strftime('%Y%m%d%H')+'/'+memstr+'/')
+      #os.makedirs(RootMe+'/ensemble/'+nowdate.strftime('%Y%m%d%H')+'/'+memstr+'/')
+      os.makedirs(RootMe+'/'+nowdate.strftime('%Y%m%d%H')+'/ensemble/'+memstr+'/')
     except:
       pass
     

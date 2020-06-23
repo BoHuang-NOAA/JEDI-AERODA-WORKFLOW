@@ -71,13 +71,13 @@ if [ ${ENSGRP} -eq 1 ]; then
   export imem="0"
   for n in $(seq 1 6); do
     export itile=$n
-    $JEDIUSH/run_seasBin_da2fcst.sh
+    $JEDIUSH/run_seasBin_da2fcst_fgat.sh
   done
 
   export imem="-1"
   for n in $(seq 1 6); do
     export itile=$n
-    $JEDIUSH/run_seasBin_da2fcst.sh
+    $JEDIUSH/run_seasBin_da2fcst_fgat.sh
   done
 fi
 fi
@@ -91,7 +91,7 @@ if [ $NMEM_AERO -gt 0 ]; then
     # need to generate files for each tile 1-6
     for n in $(seq 1 6); do
         export itile=$n
-	$JEDIUSH/run_seasBin_da2fcst.sh
+	$JEDIUSH/run_seasBin_da2fcst_fgat.sh
     done
     err=$?
   done

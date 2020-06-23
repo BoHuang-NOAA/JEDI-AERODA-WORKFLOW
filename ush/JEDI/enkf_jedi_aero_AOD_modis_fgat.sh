@@ -9,8 +9,13 @@ yyyymmddm=${gPDY}
 hhm=${gcyc}
 workdir=${DATA}/enkf_run
 ENKFFIX=${ENKFFIX:-${FIXgfs}/fix_gsi/}
+CASE=${CASE:-${CASE_ENKF}}
 nlevs=64
 aero_species=1
+
+resc=$(echo $CASE |cut -c2-5)
+export resx=${resc}
+export resy=${resc}
 
 if [[ $aero_species == 1 ]]
 then
@@ -150,9 +155,12 @@ if [[ ! -r ${analdir} ]]; then
     mkdir -p ${analdir}
 fi
 
-#$NLN ${ROTDIR}/enkfgdas.${PDY}/${cyc}/${charnanal}/hofx/viirs_aod_npp_${PDY}${cyc}.nc ${analdir}/aod_viirs_fmo.nc4 
-$NLN ${ROTDIR}/enkfgdas.${PDY}/${cyc}/${charnanal}/hofx/aod_nnr_terra_fgat_${PDY}${cyc}.nc4.ges ${analdir}/aod_nnr_terra_hofx.nc4 
-$NLN ${ROTDIR}/enkfgdas.${PDY}/${cyc}/${charnanal}/hofx/aod_nnr_aqua_fgat_${PDY}${cyc}.nc4.ges ${analdir}/aod_nnr_aqua_hofx.nc4 
+itile=0
+while [[ $itile -le 5 ]]; do
+    ${NLN} ${ROTDIR}/enkfgdas.${PDY}/${cyc}/${charnanal}/obs//aod_nnr_terra_hofx_nomodel_${PDY}${cyc}_000${itile}.nc4.ges ${analdir}/aod_nnr_terra_hofx_000${itile}.nc4
+    ${NLN} ${ROTDIR}/enkfgdas.${PDY}/${cyc}/${charnanal}/obs//aod_nnr_aqua_hofx_nomodel_${PDY}${cyc}_000${itile}.nc4.ges ${analdir}/aod_nnr_aqua_hofx_000${itile}.nc4
+    ((itile=itile+1))
+done
 
 # ensemble mean is already computed, need to link it
 itile=1
@@ -180,19 +188,26 @@ while [[ $nanal -le $NMEM_AERO ]]; do
   fi
   itile=1
   while [[ $itile -le 6 ]]; do
-    $NLN $ROTDIR/enkfgdas.${gPDY}/${gcyc}/${charnanal}/RESTART/${yyyymmdd}.${hh}0000.fv_core.res.nc.ges ${analdir}/${yyyymmdd}.${hh}0000.fv_core.res.nc
+    if [[ $itile == 1 ]]; then
+       $NLN $ROTDIR/enkfgdas.${gPDY}/${gcyc}/${charnanal}/RESTART/${yyyymmdd}.${hh}0000.fv_core.res.nc.ges ${analdir}/${yyyymmdd}.${hh}0000.fv_core.res.nc
+       $NLN $ROTDIR/enkfgdas.${gPDY}/${gcyc}/${charnanal}/RESTART/${yyyymmdd}.${hh}0000.coupler.res.ges ${analdir}/${yyyymmdd}.${hh}0000.coupler.res
+    fi
     $NLN $ROTDIR/enkfgdas.${gPDY}/${gcyc}/${charnanal}/RESTART/${yyyymmdd}.${hh}0000.fv_core.res.tile${itile}.nc.ges ${analdir}/${yyyymmdd}.${hh}0000.fv_core.res.tile${itile}.nc
     $NLN $ROTDIR/enkfgdas.${gPDY}/${gcyc}/${charnanal}/RESTART/${yyyymmdd}.${hh}0000.fv_srf_wnd.res.tile${itile}.nc.ges ${analdir}/${yyyymmdd}.${hh}0000.fv_srf_wnd.res.tile${itile}.nc
     $NLN $ROTDIR/enkfgdas.${gPDY}/${gcyc}/${charnanal}/RESTART/${yyyymmdd}.${hh}0000.phy_data.tile${itile}.nc.ges ${analdir}/${yyyymmdd}.${hh}0000.phy_data.tile${itile}.nc
     $NLN $ROTDIR/enkfgdas.${gPDY}/${gcyc}/${charnanal}/RESTART/${yyyymmdd}.${hh}0000.sfc_data.tile${itile}.nc.ges ${analdir}/${yyyymmdd}.${hh}0000.sfc_data.tile${itile}.nc
-    $NCP $ROTDIR/enkfgdas.${gPDY}/${gcyc}/${charnanal}/RESTART/${yyyymmdd}.${hh}0000.fv_tracer.res.tile${itile}.nc.ges ${analdir}/${yyyymmdd}.${hh}0000.fv_tracer.res.tile${itile}.nc
+    $NLN $ROTDIR/enkfgdas.${gPDY}/${gcyc}/${charnanal}/RESTART/${yyyymmdd}.${hh}0000.fv_tracer.res.tile${itile}.nc.ges ${analdir}/${yyyymmdd}.${hh}0000.fv_tracer.res.tile${itile}.nc
     $NCP $ROTDIR/enkfgdas.${gPDY}/${gcyc}/${charnanal}/RESTART/${yyyymmdd}.${hh}0000.fv_tracer.res.tile${itile}.nc.ges $ROTDIR/enkfgdas.${gPDY}/${gcyc}/${charnanal}/RESTART/${yyyymmdd}.${hh}0000.fv_tracer.res.tile${itile}.nc
     $NLN $ROTDIR/enkfgdas.${gPDY}/${gcyc}/${charnanal}/RESTART/${yyyymmdd}.${hh}0000.fv_tracer.res.tile${itile}.nc ${analdir}/${yyyymmdd}.${hh}0000.anal.fv_tracer.res.tile${itile}.nc
     ((itile=itile+1))
   done
-  #$NLN ${ROTDIR}/enkfgdas.${PDY}/${cyc}/${charnanal}/hofx/viirs_aod_npp_${PDY}${cyc}.nc ${analdir}/aod_viirs_fmo.nc4 
-  $NLN ${ROTDIR}/enkfgdas.${PDY}/${cyc}/${charnanal}/hofx/aod_nnr_terra_fgat_${PDY}${cyc}.nc.ges ${analdir}/aod_nnr_terra_hofx.nc4 
-  $NLN ${ROTDIR}/enkfgdas.${PDY}/${cyc}/${charnanal}/hofx/aod_nnr_aqua_fgat_${PDY}${cyc}.nc.ges ${analdir}/aod_nnr_aqua_hofx.nc4 
+  itile=0
+  while [[ $itile -le 5 ]]; do
+      ${NLN} ${ROTDIR}/enkfgdas.${PDY}/${cyc}/${charnanal}/obs//aod_nnr_terra_hofx_nomodel_${PDY}${cyc}_000${itile}.nc4.ges ${analdir}/aod_nnr_terra_hofx_000${itile}.nc4
+      ${NLN} ${ROTDIR}/enkfgdas.${PDY}/${cyc}/${charnanal}/obs//aod_nnr_aqua_hofx_nomodel_${PDY}${cyc}_000${itile}.nc4.ges ${analdir}/aod_nnr_aqua_hofx_000${itile}.nc4
+      ((itile=itile+1))
+  done
+
   ((nanal=nanal+1))
 done
 
