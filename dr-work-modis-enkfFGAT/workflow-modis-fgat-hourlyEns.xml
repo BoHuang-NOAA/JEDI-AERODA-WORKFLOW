@@ -655,7 +655,10 @@
 	<envar><name>PDY</name><value><cyclestr>@Y@m@d</cyclestr></value></envar>
 	<envar><name>cyc</name><value><cyclestr>@H</cyclestr></value></envar>
 	<dependency>
-                <metataskdep metatask="gdasefmn"/>
+		<and>
+			<taskdep task="gdasfcst"/>
+                	<metataskdep metatask="gdasefmn"/>
+		</and>
 	</dependency>
 			
 </task>

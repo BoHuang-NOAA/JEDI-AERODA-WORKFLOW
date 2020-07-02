@@ -176,7 +176,7 @@ exit 0
 EOF
 
 cd ${hpssTmp}
-sbatch job_hpss_${CDATE}.sh
+#sbatch job_hpss_${CDATE}.sh
 
 exit $?
 
