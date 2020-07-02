@@ -272,7 +272,7 @@ ${nln} ${BumpDir} ${WorkDir}/"bump"
 #obsfile_aqua=${ObsDir}"/nnr_aqua."${obsstr}".nc"
 #${nln} ${obsfile_terra} ${obsin_terra}
 #${nln} ${obsfile_aqua} ${obsin_aqua}
-obsfile_viirs=${ObsDir}"/viirs_aod_snpp."${obsstr}".nc"
+obsfile_viirs=${ObsDir}/viirs_aod_snpp.${obsstr}.nc
 ${nln} ${obsfile_viirs} ${obsin_viirs}
 
 

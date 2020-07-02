@@ -60,9 +60,10 @@ elif [[ ${mem} -eq -1 ]]; then
 fi
 
 obsstr=${nexttime}
-obsfile=${ObsDir}"/"${obsstr}"/${satID}_aod_npp_"${obsstr}".nc"
+#obsfile=${ObsDir}"/"${obsstr}"/${satID}_aod_snpp."${obsstr}".nc"
 #obsfile=${ObsDir}"/"${obsstr}"/nnr."${obsstr}".nc"
 #obsfile=${ObsDir}"/nnr_${satID}."${obsstr}".nc"
+obsfile=${ObsDir}/${satID}_aod_snpp.${obsstr}.nc
 
 if [[ -e ${WorkDir}/aod_${satID}_obsin.nc ]]; then
    ${nrm} ${WorkDir}/aod_${satID}_obsin.nc

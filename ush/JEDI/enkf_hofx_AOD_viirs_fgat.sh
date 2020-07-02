@@ -139,7 +139,7 @@ while [ ${bkgtimest} -le ${bkgtimeed} ]; do
    
    echo "  - date: '${bkgdatestr}'" >> ${WorkDir}/bkgtmp.info
    echo "    filetype: gfs"        >> ${WorkDir}/bkgtmp.info
-   echo "    datapath_tile: ${inputdir}" >> ${WorkDir}/bkgtmp.info
+   echo "    datapath: ${inputdir}" >> ${WorkDir}/bkgtmp.info
    echo "    filename_core: ${bkgdatestr1}.fv_core.res.nc" >> ${WorkDir}/bkgtmp.info
    echo "    filename_trcr: ${bkgdatestr1}.fv_tracer.res.nc" >> ${WorkDir}/bkgtmp.info
    echo "    filename_cplr: ${bkgdatestr1}.coupler.res" >> ${WorkDir}/bkgtmp.info

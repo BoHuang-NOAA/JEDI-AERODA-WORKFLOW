@@ -1,5 +1,5 @@
-This document describes steps of preparing,  setting-up and running this workflow of performing aerosola data 
-assimilation on Hera machine 
+This document describes steps of preparing,  setting-up and running this workflow of performing aerosol data 
+assimilation of viirs and modis AOD observation on Hera machine 
 --- Bo Huang (bo.huang@noaa.gov)
 --- June 12 2020
 
@@ -41,7 +41,11 @@ assimilation on Hera machine
 	      ($CDATE is the analysis cycle, ${ICDIR} defined in dr-work-modis/*.xml).
 
 (4) Workflow for model spin-up and DA cycling
-	(4.1) global-workflow-clean/dr-work-modis for assimilation of MODIS AOD obs from aqua and terra satellites.
+	(4.1) global-workflow-clean/dr-work-* (rocoto job flow)
+		(4.1.a) dr-work-modis (dr-work-modis-enkfFGAT) for assimilation of MODIS AOD obs from aqua and terra satellites 
+		        without (with) applying FGAT in the AOD hofx calculation in the EnVar and EnKF update.
+		(4.1.b) dr-work-viirs (dr-work-viirs-enkfFGAT) for assimilation of VIIRS AOD obs from snpp satellites 
+		        without (with) applying FGAT in the AOD hofx calculation in the EnVar and EnKF update.
 	(4.2) it contains a a rocotol xml file (jedi-3denvar-aeroDA-modis.xml) and general configuration files (config.*).
 		(4.2.a) In the beginning of *.xml file, it defines the cycling period and the directory for observations,		         
 		        model, etc.
@@ -62,7 +66,7 @@ assimilation on Hera machine
 			(f5)  gdasemeananl: calculate ensemble mean of aerosol analysis;
 			(f6)  gdashxaodanl: calculate AOD hofx of control and ensemble mean aerosol analysis;
 			(f7)  seasbinda2fcst: change the sea salt bin orders from the GOCART model (e.g., analysis files)			           
-			      to FV3 model (e.g., backgorund files) for the following background forecast in f8;
+			          to FV3 model (e.g., backgorund files) for the following background forecast in f8;
 			(f8)  gdasfcst and gdasefmn: run control and ensemble background forecasts;
 			(f9)  gdasemean: calculate background ensemble emean;
                         (f10) seasbinfcst2da: change the sea salt bin orders from FV3 model to the GOCART model for the 

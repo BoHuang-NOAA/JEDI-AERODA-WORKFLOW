@@ -14,7 +14,7 @@
 	-->
 
 	<!-- Experiment parameters such as name, starting, ending dates -->
-	<!ENTITY PSLOT "workflow-modis-fgat-hourlyEns">
+	<!ENTITY PSLOT "jedi-3denvar-aeroDA-viirs-enkfFGAT">
 	<!ENTITY SDATE "201606010000">
 	<!ENTITY EDATE "201606011800">
 
@@ -27,7 +27,8 @@
 	<!ENTITY TOPRUNDIR "/scratch2/BMC/gsd-fv3-dev/MAPP_2018/bhuang/JEDI-2020/JEDI-FV3/expRuns"> 
 	<!ENTITY TOPICDIR "/scratch1/BMC/gsd-fv3-dev/MAPP_2018/bhuang/JEDI-2020/JEDI-FV3/dataSets">
 	<!--ENTITY TOPOBSDIR "/scratch1/BMC/wrf-chem/pagowski/MAPP_2018/OBS/VIIRS/AOT/thinned_"-->
-	<!ENTITY TOPOBSDIR  "/scratch1/BMC/gsd-fv3-dev/MAPP_2018/bhuang/JEDI-2020/JEDI-FV3/dataSets/NNR_AOD_Obs/2016Case/thinned_C192/">
+	<!--ENTITY TOPOBSDIR  "/scratch1/BMC/gsd-fv3-dev/MAPP_2018/bhuang/JEDI-2020/JEDI-FV3/dataSets/NNR_AOD_Obs/2016Case/thinned_C192/"-->
+	<!ENTITY TOPOBSDIR  "/scratch1/BMC/gsd-fv3-dev/MAPP_2018/bhuang/JEDI-2020/JEDI-FV3/dataSets/VIIRS_AOD_Obs/2016Case/thinned_C192/">
 
 	<!-- Experiment and Rotation directory -->
 	<!ENTITY EXPDIR "&TOPRUNDIR;/&PSLOT;/dr-work/">
@@ -47,8 +48,8 @@
 	<!ENTITY HPSSDIR "/BMC/fim/5year/MAPP_2018/bhuang/expRuns/">
 
 	<!-- Machine related entities -->
-	<!ENTITY ACCOUNT    "chem-var">
-	<!ENTITY QUEUE      "batch">
+	<!ENTITY ACCOUNT    "wrf-chem">
+	<!ENTITY QUEUE      "debug">
 	<!ENTITY QUEUE_ARCH "service">
 	<!ENTITY PARTITION_ARCH "service">
 	<!ENTITY SCHEDULER  "slurm">
@@ -461,7 +462,7 @@
 
 <task name="gdashxaodanl" cycledefs="gdas" maxtries="&MAXTRIES;">
 
-	<command>&JOBS_DIR;/analhxaod_AOD_modis.sh</command>
+	<command>&JOBS_DIR;/analhxaod_AOD_viirs.sh</command>
 
 	<jobname><cyclestr>&PSLOT;_gdashxaodanl_@H</cyclestr></jobname>
 	<account>&ACCOUNT;</account>
@@ -711,7 +712,7 @@
 
 	<task name="gdashxaod#grp#" cycledefs="ens" maxtries="&MAXTRIES;">
 
-		<command>&JOBS_DIR;/enshxaodbckg_AOD_modis.sh</command>
+		<command>&JOBS_DIR;/enshxaodbckg_AOD_viirs.sh</command>
 
 		<jobname><cyclestr>&PSLOT;_gdashxaod#grp#_@H</cyclestr></jobname>
 		<account>&ACCOUNT;</account>
@@ -751,7 +752,7 @@
 
 	<task name="gdashxaodfgat#grp#" cycledefs="ens" maxtries="&MAXTRIES;">
 
-		<command>&JOBS_DIR;/enshxaodbckg_AOD_modis_fgat.sh</command>
+		<command>&JOBS_DIR;/enshxaodbckg_AOD_viirs_fgat.sh</command>
 
 		<jobname><cyclestr>&PSLOT;_gdashxaodfgat#grp#_@H</cyclestr></jobname>
 		<account>&ACCOUNT;</account>
