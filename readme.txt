@@ -74,6 +74,7 @@ assimilation of viirs and modis AOD observation on Hera machine
 			(c11) gdashxaod: calculate AOD hofx of control and ensemble aerosol background.
 			(c12) cleandata: clean up unnecessary data and backup to HPSS.
 
+
 		(4.2.g) To configure your own experiment, please modify accordingly in the configuration files 
 			(e.g., config.base, config.anal, etc). 
 		(4.2.h) After ${PSLOT}, ${TOPRUNDIR} are defined in (4.2.b), create the directory and copy dr-work-modis
@@ -87,3 +88,11 @@ assimilation of viirs and modis AOD observation on Hera machine
 	(4.4) To run free-forecast or spin-up without DA (e.g.,2015121000-2015123118), the same workflow applies by 
 	      turning off gdasanal,gdaseupd, gdasemeananl, gdashxaodanl, seasbinda2fcst, seasbinfcst2da and gdashxaod, 
 	      and modifying the dependency accordingly. 
+
+		(4.2.d) To configure your own experiment, some parameters in config.base and config.anal (or more config.* files) in this directory need to be modified (e.g. ensemble size=40 instead of 20 in our running).
+		(4.2.e) After ${PSLOT}, ${TOPRUNDIR} are defined in (4.2.a), create the directory accordingly and copy dr-work-modis directory as ${TOPRUNDIR}/${PSLOT}/dr-work.  
+		(4.2.f) Create ${TOPRUNDIR}/${PSLOT}/dr-data, and copy the initial conditions from (1) there. This direcotyr will be used to store the data from the cycling. 
+		(4.2.g) About rococo job submission, please refer to the following website (https://github.com/christopherwharrop/rocoto/wiki/Documentation )
+	(4.3) The required scirpts for cycling are stored in /ush, scripts and the link of required executables are at /exec
+	(4.4) To run free-forecast or spin-up without DA (e.g.,2015121000-2015123118), the same workflow applies by turning off gdasanal,gdaseupd, gdasemeananl, gdashxaodanl, seasbinda2fcst, seasbinfcst2da and gdashxaod, and modifying the dependency accordingly. 
+
