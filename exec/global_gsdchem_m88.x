@@ -1,1 +1,0 @@
-/scratch1/BMC/gsd-fv3-dev/MAPP_2018/bhuang/JEDI-2020/fileCory-20200126/scripts/GSDChem_cycling_Cory_20200126/sorc/gsdchem.fd/NEMS/exe/global_gsdchem.x

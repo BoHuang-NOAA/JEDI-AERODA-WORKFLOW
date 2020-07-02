@@ -48,14 +48,16 @@ dataDir=${ROTDIR}
 tmpDir=${ROTDIR}/hpssTmp
 bakupDir=${ROTDIR}/../dr-data-backup
 logDir=${ROTDIR}/logs
-incdate=/home/Bo.Huang/JEDI-2020/usefulScripts/incdate.sh
+incdate=/scratch2/NCEPDEV/nwprod/NCEPLIBS/utils/prod_util.v1.1.0/exec/ndate
 nanal=${NMEM_AERO}
-cycN=\`\${incdate} ${CDATE} -12\`
+cycN=\`\${incdate} -12 ${CDATE}\`
+cycN1=\`\${incdate} 6 \${cycN}\`
 
 mkdir -p \${tmpDir}
 mkdir -p \${bakupDir}
 
-hpssDir=/ESRL/BMC/wrf-chem/5year/Bo.Huang/JEDIFV3-AERODA/expRuns/
+#hpssDir=/ESRL/BMC/wrf-chem/5year/Bo.Huang/JEDIFV3-AERODA/expRuns/
+hpssDir=${HPSSDIR}
 hpssExpDir=\${hpssDir}/\${expName}/dr-data/
 hsi "mkdir -p \${hpssExpDir}"
 
@@ -65,6 +67,14 @@ cycM=\`echo \${cycN} | cut -c 5-6\`
 cycD=\`echo \${cycN} | cut -c 7-8\`
 cycH=\`echo \${cycN} | cut -c 9-10\`
 cycYMD=\`echo \${cycN} | cut -c 1-8\`
+
+echo \${cycN1}
+cyc1Y=\`echo \${cycN1} | cut -c 1-4\`
+cyc1M=\`echo \${cycN1} | cut -c 5-6\`
+cyc1D=\`echo \${cycN1} | cut -c 7-8\`
+cyc1H=\`echo \${cycN1} | cut -c 9-10\`
+cyc1YMD=\`echo \${cycN1} | cut -c 1-8\`
+cyc1prefix=\${cyc1YMD}.\${cyc1H}0000
 
 cntlGDAS=\${dataDir}/gdas.\${cycYMD}/\${cycH}/
 
@@ -82,8 +92,8 @@ if [ -s \${cntlGDAS} ]; then
     cntlBakup=\${bakupDir}/gdas.\${cycYMD}/\${cycH}/
     mkdir -p \${cntlBakup}
     /bin/cp \${cntlGDAS}/RESTART/*.fv_aod_* \${cntlBakup}/
-    /bin/cp \${cntlGDAS}/hofx/* \${cntlBakup}/
-    #/bin/cp \${cntlGDAS}/RESTART/*.fv_tracer.* \${cntlBakup}/
+    /bin/cp \${cntlGDAS}/obs/* \${cntlBakup}/
+    /bin/cp \${cntlGDAS}/RESTART/\${cyc1prefix}.fv_tracer.* \${cntlBakup}/
 
     if [ \$? != '0' ]; then
        echo "Copy Control gdas.\${cycYMD}\${cycH} failed and exit at error code \$?"
@@ -103,8 +113,8 @@ if [ -s \${cntlGDAS} ]; then
 
     mkdir -p \${enkfBakup_Mean}
     /bin/cp \${enkfGDAS_Mean}/RESTART/*.fv_aod_* \${enkfBakup_Mean}/
-    /bin/cp \${enkfGDAS_Mean}/hofx/* \${enkfBakup_Mean}/
-    #/bin/cp \${enkfGDAS_Mean}/RESTART/*.fv_tracer.* \${enkfBakup_Mean}/
+    /bin/cp \${enkfGDAS_Mean}/obs/* \${enkfBakup_Mean}/
+    /bin/cp \${enkfGDAS_Mean}/RESTART/\${cyc1prefix}.fv_tracer.* \${enkfBakup_Mean}/
 
     ianal=1
     while [ \${ianal} -le \${nanal} ]; do
@@ -121,7 +131,7 @@ if [ -s \${cntlGDAS} ]; then
        ### back mem data
        mkdir -p \${enkfBakup_Mem}
        /bin/cp \${enkfGDAS_Mem}/RESTART/*.fv_aod_* \${enkfBakup_Mem}
-       /bin/cp \${enkfGDAS_Mem}/hofx/* \${enkfBakup_Mem}
+       /bin/cp \${enkfGDAS_Mem}/obs/* \${enkfBakup_Mem}
        #/bin/cp \${enkfGDAS_Mem}/RESTART/*.fv_tracer.* \${enkfBakup_Mem}
 
        ianal=\$[\$ianal+1]
@@ -143,7 +153,7 @@ if [ -s \${cntlGDAS} ]; then
 	exit \${stat}
     else
        echo "HTAR at gdas.\${cycN} completed !"
-       #/bin/rm -rf  \${cntlGDAS}   #./gdas.\${cycN}
+       /bin/rm -rf  \${cntlGDAS}   #./gdas.\${cycN}
     fi
 
     #htar -cv -f \${hpssExpDir}/enkfgdas.\${cycN}.tar \${enkfGDAS}
@@ -157,10 +167,10 @@ if [ -s \${cntlGDAS} ]; then
     	exit \${stat}
     else
        echo "HTAR at enkfgdas.\${cycN} completed !"
-       /bin/rm -rf \${enkfGDAS}/mem???  #./enkfgdas.\${cycN}
+       /bin/rm -rf \${enkfGDAS}  #./enkfgdas.\${cycN}
     fi
 
-    cycN=\`\${incdate} \${cycN} \${cycInc}\`
+    cycN=\`\${incdate} \${cycInc}  \${cycN}\`
 fi
 exit 0
 EOF

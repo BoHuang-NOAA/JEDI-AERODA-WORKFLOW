@@ -57,9 +57,9 @@ yamlfile=${WorkDir}"/hyb-3dvar_gfs_aero.yaml"
 obsstr=${validtime}
 #startwinstr
 obsin_terra="./input/aod_nnr_terra_obs_"${obsstr}".nc4"
-obsout_terra="aod_nnr_terra_fmo_"${obsstr}".nc4"
+obsout_terra="aod_nnr_terra_hofx_3dvar_"${obsstr}".nc4"
 obsin_aqua="./input/aod_nnr_aqua_obs_"${obsstr}".nc4"
-obsout_aqua="aod_nnr_aqua_fmo_"${obsstr}".nc4"
+obsout_aqua="aod_nnr_aqua_hofx_3dvar_"${obsstr}".nc4"
 
 # generate memstrs based on number of members
 imem=1
@@ -290,19 +290,18 @@ obsfile_aqua=${ObsDir}"/nnr_aqua."${obsstr}".nc"
 ${nln} ${obsfile_terra} ${obsin_terra}
 ${nln} ${obsfile_aqua} ${obsin_aqua}
 
-# link fmo
 analroot=${RotDir}"gdas."${vyy}${vmm}${vdd}"/"${vhh}"/"
 mkdir -p ${analroot}
 
 iproc=0
 while [ ${iproc} -le 5 ]; do
    procstr=`printf %04d ${iproc}`
-   hofxout_terra=${analroot}"/aod_nnr_terra_fmo_"${obsstr}"_"${procstr}".nc4"
-   hofx_terra=${WorkDir}"/aod_nnr_terra_fmo_"${obsstr}"_"${procstr}".nc4"
+   hofxout_terra=${analroot}"/aod_nnr_terra_hofx_3dvar_"${obsstr}"_"${procstr}".nc4"
+   hofx_terra=${WorkDir}"/aod_nnr_terra_hofx_3dvar_"${obsstr}"_"${procstr}".nc4"
    ${nln} ${hofxout_terra} ${hofx_terra}
 
-   hofxout_aqua=${analroot}"/aod_nnr_aqua_fmo_"${obsstr}"_"${procstr}".nc4"
-   hofx_aqua=${WorkDir}"/aod_nnr_aqua_fmo_"${obsstr}"_"${procstr}".nc4"
+   hofxout_aqua=${analroot}"/aod_nnr_aqua_hofx_3dvar_"${obsstr}"_"${procstr}".nc4"
+   hofx_aqua=${WorkDir}"/aod_nnr_aqua_hofx_3dvar_"${obsstr}"_"${procstr}".nc4"
    ${nln} ${hofxout_aqua} ${hofx_aqua}
 
    iproc=$((iproc+1))

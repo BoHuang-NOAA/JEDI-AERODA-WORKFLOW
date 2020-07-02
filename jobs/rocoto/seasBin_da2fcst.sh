@@ -42,7 +42,6 @@ export JEDIUSH=${JEDIUSH:-$HOMEgfs/ush/JEDI/}
 CDATE=${CDATE:-"2001010100"}
 CDUMP=${CDUMP:-"gdas"}
 GDUMP=${GDUMP:-"gdas"}
-export CASE=${CASE:-"C96"}
 
 
 # Derived base variables

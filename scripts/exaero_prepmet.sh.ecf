@@ -58,7 +58,7 @@ LATB_CASE=$((res*2))
 LONB_CASE=$((res*4))
 
 #ATMTERR=${ATMTERR:-/scratch1/NCEPDEV/da/Cory.R.Martin/Datasets/Terrain4Aero/${CASE}_${LEVS}_example$SUFFIX}
-ATMTERR=${ATMTERR:-/scratch1/BMC/gsd-fv3-dev/MAPP_2018/bhuang/JEDI-2020/JEDI-FV3/dataSets/Terrain4Aero/${CASE}_${LEVS}_example$SUFFIX}
+#ATMTERR=${ATMTERR:-/scratch1/BMC/gsd-fv3-dev/MAPP_2018/bhuang/JEDI-2020/JEDI-FV3/dataSets/Terrain4Aero/${CASE}_${LEVS}_example$SUFFIX}
 ATMTERR=$ATMGES
 module load nco # temporary CRM
 

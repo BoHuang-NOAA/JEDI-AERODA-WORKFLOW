@@ -15,14 +15,12 @@ mkdir ${WorkDir}
 if [[ ${mem} -gt 0 ]]; then
    cdump="enkfgdas"
    memdir="mem"`printf %03d $mem`
-   restart_inverval=${restart_inverval_enkf}
-elif [[ ${mem} -eq -1 ]]; then
+elif [[ ${mem} -eq 0 ]]; then
    cdump="enkfgdas"
    memdir="ensmean"
-elif [[ ${mem} -eq 0 ]]; then
+elif [[ ${mem} -eq -1 ]]; then
    cdump="gdas"
    memdir=""
-   restart_inverval=${restart_inverval_cntl}
 fi
 
 vyy=$(echo $validtime | cut -c1-4)
@@ -49,25 +47,4 @@ ncrename -O -v seas5,seas6 -v seas4,seas5 -v seas3,seas4 -v seas2,seas3 -v seas1
 /bin/rm -rf ${dir_tracer}/${fname_tracer}
 ncrename -O -v seas6,seas1 ${dir_tracer}/${fname_tracer}_tmp ${dir_tracer}/${fname_tracer}
 /bin/rm -rf ${dir_tracer}/${fname_tracer}_tmp
-
-if [ ${FGAT3D} == "YES" -a ${imem} -ne 0 ]; then
-   nexttimem3=$($NDATE -$assim_freq_half $nexttime) 
-   nexttimep3=$($NDATE $assim_freq_half $nexttime) 
-   nexttimetmp=${nexttimem3}
-   while [ ${nexttimetmp} -le ${nexttimep3} ]; do
-	if [ ${nexttimetmp} != ${nexttime} ]; then
-	    nyytmp=$(echo $nexttimetmp | cut -c1-4)
-	    nmmtmp=$(echo $nexttimetmp | cut -c5-6)
-	    nddtmp=$(echo $nexttimetmp | cut -c7-8)
-	    nhhtmp=$(echo $nexttimetmp | cut -c9-10)
-	    ndatestrtmp="${nyytmp}${nmmtmp}${nddtmp}.${nhhtmp}0000"
-
-	    fname_tracer_ges_orig="${ndatestrtmp}.fv_tracer.res.tile${itile}.nc.ges_orig"
-	    fname_tracer_ges="${ndatestrtmp}.fv_tracer.res.tile${itile}.nc.ges"
-
-	    /bin/mv ${dir_tracer}/${fname_tracer_ges_orig} ${dir_tracer}/${fname_tracer_ges}
-        fi
-	nexttimetmp=$($NDATE +$restart_interval $nexttimetmp)
-   done
-fi
 exit $?

@@ -72,7 +72,7 @@ if [ $DO_CALC_INCREMENT = "YES" ]; then
       mem="mem$mem1"
       mkdir -p $ROTDIR/enkfgdas.$PDY/$cyc/$mem/
       $NLN $ROTDIR/enkfgdas.$HISDAY/${HIScyc}/$mem/${CDUMP}.t${HIScyc}z.atmf${fhr}$SUFFIX.ges atmges_mem001
-      $NLN $ICSDIR/${CASE}/enkfgdas.$PDY/$cyc/$mem/$CDUMP.$cycle.atmanl$SUFFIX atmanl_mem001
+      $NLN $ICSDIR/${CASE_ENKF}/enkfgdas.$PDY/$cyc/$mem/$CDUMP.$cycle.atmanl$SUFFIX atmanl_mem001
       $NLN $ROTDIR/enkfgdas.$PDY/$cyc/$mem/$CDUMP.$cycle.atminc.nc atminc_mem001
       rm calc_increment.nml
       cat > calc_increment.nml << EOF

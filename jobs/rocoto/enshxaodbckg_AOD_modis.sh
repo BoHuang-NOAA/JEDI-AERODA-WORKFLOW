@@ -50,7 +50,6 @@ export JEDIUSH=${JEDIUSH:-$HOMEgfs/ush/JEDI/}
 CDATE=${CDATE:-"2001010100"}
 CDUMP=${CDUMP:-"gdas"}
 GDUMP=${GDUMP:-"gdas"}
-export CASE=${CASE:-"C96"}
 
 
 # Derived base variables
@@ -99,45 +98,61 @@ export NDATE=${ndate1}
 
 
 sensors="v.modis_terra v.modis_aqua"
-for sensor in ${sensors}; do
-    export sensorID=${sensor}
-# do ensemble mean first
 if [ $NMEM_AERO -gt 0 ]; then
 if [ ${ENSGRP} -eq 1 ]; then
-  export imem="-1"
-  for n in $(seq 1 6); do
-    # create namelist from Python script  
-    export itile=$n
-    #$JEDIUSH/gen_nml_gocart_aod.py 
-    $JEDIUSH/gen_nml_gocart_bckg_AOD_modis.sh
-    cat gocart_aod_fv3_mpi.nl
-    # run the executable
-    srun --export=all ./aod_fv3tile.x 
-  done
-  # compute H(x) and put it in the obs files
-  #$JEDIUSH/setup_ens_aodhofx.py
-  $JEDIUSH/setup_ens_aodhofx_bckg_AOD_modis.sh
-  ./aod_ens_hofx.x
+# do ensemble control first
+export CASE=${CASE:-"C96"}
+export imem="-1"
+for sensor in ${sensors}; do
+    export sensorID=${sensor}
+    for n in $(seq 1 6); do
+        # create namelist from Python script  
+        export itile=$n
+        $JEDIUSH/gen_nml_gocart_bckg_AOD_modis.sh
+        cat gocart_aod_fv3_mpi.nl
+        # run the executable
+        srun --export=all ./aod_fv3tile.x 
+    done
+    # compute H(x) and put it in the obs files
+    $JEDIUSH/setup_ens_aodhofx_bckg_AOD_modis.sh
+    ./aod_ens_hofx.x
+    err=$?
+    if [ ${err} != 0 ]; then
+       exit ${err}
+    fi
+    /bin/rm -rf gocart_aod_fv3_mpi.nl fv3aod2obs.nl
+done
 
-  export imem="0"
-  for n in $(seq 1 6); do
-    # create namelist from Python script  
-    export itile=$n
-    #$JEDIUSH/gen_nml_gocart_aod.py 
-    $JEDIUSH/gen_nml_gocart_bckg_AOD_modis.sh
-    cat gocart_aod_fv3_mpi.nl
-    # run the executable
-    srun --export=all ./aod_fv3tile.x 
-  done
-  # compute H(x) and put it in the obs files
-  #$JEDIUSH/setup_ens_aodhofx.py
-  $JEDIUSH/setup_ens_aodhofx_bckg_AOD_modis.sh
-  ./aod_ens_hofx.x
+# ensemble mean
+export CASE=${CASE_ENKF:-"C96"}
+export imem="0"
+for sensor in ${sensors}; do
+    export sensorID=${sensor}
+    for n in $(seq 1 6); do
+        # create namelist from Python script  
+        export itile=$n
+        $JEDIUSH/gen_nml_gocart_bckg_AOD_modis.sh
+        cat gocart_aod_fv3_mpi.nl
+        # run the executable
+        srun --export=all ./aod_fv3tile.x 
+    done
+    # compute H(x) and put it in the obs files
+    $JEDIUSH/setup_ens_aodhofx_bckg_AOD_modis.sh
+    ./aod_ens_hofx.x
+    err=$?
+    if [ ${err} != 0 ]; then
+       exit ${err}
+    fi
+    /bin/rm -rf gocart_aod_fv3_mpi.nl fv3aod2obs.nl
+done
 fi
 fi
 
 ###############################################################
 # need to loop through ensemble members if necessary
+export CASE=${CASE_ENKF:-"C96"}
+for sensor in ${sensors}; do
+export sensorID=${sensor}
 if [ $NMEM_AERO -gt 0 ]; then
   #for mem0 in {1..$NMEM_AERO}; do
   for mem0 in {${ENSBEG}..${ENSEND}}; do
@@ -156,6 +171,10 @@ if [ $NMEM_AERO -gt 0 ]; then
     $JEDIUSH/setup_ens_aodhofx_bckg_AOD_modis.sh
     ./aod_ens_hofx.x
     err=$?
+    if [ ${err} != 0 ]; then
+       exit ${err}
+    fi
+    /bin/rm -rf gocart_aod_fv3_mpi.nl fv3aod2obs.nl
   done
 fi
 done # sensors loop completed!

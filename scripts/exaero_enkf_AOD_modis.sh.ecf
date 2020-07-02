@@ -69,7 +69,7 @@ UNCOMPRESS=${UNCOMPRESS:-gunzip}
 APRUNCFP=${APRUNCFP:-""}
 
 # FV3 specific info
-export CASE=${CASE:-"C384"}
+export CASE=${CASE_ENKF:-"C384"}
 ntiles=${ntiles:-6}
 #LEVS=${LEVS:-$($NCLEN $ATMGES pfull)} # get LEVS
 # for above 'levs' in tiles is actually LEVS+1

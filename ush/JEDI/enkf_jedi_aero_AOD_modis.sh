@@ -9,8 +9,14 @@ yyyymmddm=${gPDY}
 hhm=${gcyc}
 workdir=${DATA}/enkf_run
 ENKFFIX=${ENKFFIX:-${FIXgfs}/fix_gsi/}
+CASE=${CASE:-${CASE_ENKF}}
 nlevs=64
 aero_species=1
+
+# define resolution
+resc=$(echo $CASE |cut -c2-5)
+export resx=${resc}
+export resy=${resc}
 
 if [[ $aero_species == 1 ]]
 then
@@ -149,27 +155,14 @@ cat enkf.nml
 $NLN $ENKFFIX/aeroinfo_aod.txt ./aeroinfo
 $NLN $ENKFFIX/anavinfo_fv3_gocart_enkf ./anavinfo
 
-##### TODO combine H(x) files
-#charnanal="ensmean"
-#mkdir -p ${ROTDIR}/enkfgdas.${PDY}/${cyc}/${charnanal}/hofx/
-#$NCP ${ROTDIR}/gdas.${PDY}/${cyc}/aod_viirs_fmo_${PDY}${cyc}_0000.nc4 ${ROTDIR}/enkfgdas.${PDY}/${cyc}/${charnanal}/hofx/aod_viirs_fmo.nc4
-#nanal=1
-#while [[ $nanal -le $NMEM_AERO ]]; do 
-#  charnanal=mem`printf %03i $nanal`
-#  mkdir -p ${ROTDIR}/enkfgdas.${PDY}/${cyc}/${charnanal}/hofx/
-#  $NCP ${ROTDIR}/gdas.${PDY}/${cyc}/aod_viirs_fmo_${PDY}${cyc}_0000.nc4 ${ROTDIR}/enkfgdas.${PDY}/${cyc}/${charnanal}/hofx/aod_viirs_fmo.nc4
-#  ((nanal=nanal+1))
-#done
-
 charnanal="ensmean"
 analdir=${workdir}/analysis/$PDY$cyc/$charnanal
 if [[ ! -r ${analdir} ]]; then
     mkdir -p ${analdir}
 fi
 
-#$NLN ${ROTDIR}/enkfgdas.${PDY}/${cyc}/${charnanal}/hofx/viirs_aod_npp_${PDY}${cyc}.nc ${analdir}/aod_viirs_fmo.nc4 
-$NLN ${ROTDIR}/enkfgdas.${PDY}/${cyc}/${charnanal}/hofx/aod_nnr_terra_${PDY}${cyc}.nc.ges ${analdir}/aod_nnr_terra_hofx.nc4 
-$NLN ${ROTDIR}/enkfgdas.${PDY}/${cyc}/${charnanal}/hofx/aod_nnr_aqua_${PDY}${cyc}.nc.ges ${analdir}/aod_nnr_aqua_hofx.nc4 
+$NLN ${ROTDIR}/enkfgdas.${PDY}/${cyc}/${charnanal}/obs/aod_nnr_terra_hofx_3dvar_${PDY}${cyc}.nc.ges ${analdir}/aod_nnr_terra_hofx.nc4 
+$NLN ${ROTDIR}/enkfgdas.${PDY}/${cyc}/${charnanal}/obs/aod_nnr_aqua_hofx_3dvar_${PDY}${cyc}.nc.ges ${analdir}/aod_nnr_aqua_hofx.nc4 
 
 # ensemble mean is already computed, need to link it
 itile=1
@@ -209,9 +202,8 @@ while [[ $nanal -le $NMEM_AERO ]]; do
     $NLN $ROTDIR/enkfgdas.${gPDY}/${gcyc}/${charnanal}/RESTART/${yyyymmdd}.${hh}0000.fv_tracer.res.tile${itile}.nc ${analdir}/${yyyymmdd}.${hh}0000.anal.fv_tracer.res.tile${itile}.nc
     ((itile=itile+1))
   done
-  #$NLN ${ROTDIR}/enkfgdas.${PDY}/${cyc}/${charnanal}/hofx/viirs_aod_npp_${PDY}${cyc}.nc ${analdir}/aod_viirs_fmo.nc4 
-  $NLN ${ROTDIR}/enkfgdas.${PDY}/${cyc}/${charnanal}/hofx/aod_nnr_terra_${PDY}${cyc}.nc.ges ${analdir}/aod_nnr_terra_hofx.nc4 
-  $NLN ${ROTDIR}/enkfgdas.${PDY}/${cyc}/${charnanal}/hofx/aod_nnr_aqua_${PDY}${cyc}.nc.ges ${analdir}/aod_nnr_aqua_hofx.nc4 
+  $NLN ${ROTDIR}/enkfgdas.${PDY}/${cyc}/${charnanal}/obs/aod_nnr_terra_hofx_3dvar_${PDY}${cyc}.nc.ges ${analdir}/aod_nnr_terra_hofx.nc4 
+  $NLN ${ROTDIR}/enkfgdas.${PDY}/${cyc}/${charnanal}/obs/aod_nnr_aqua_hofx_3dvar_${PDY}${cyc}.nc.ges ${analdir}/aod_nnr_aqua_hofx.nc4 
   ((nanal=nanal+1))
 done
 

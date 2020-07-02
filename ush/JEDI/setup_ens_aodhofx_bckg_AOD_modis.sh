@@ -69,11 +69,11 @@ fi
 
 ${ncp} ${obsfile} ${WorkDir}/nnr_${satID}_obsin.nc
 
-outputdir=${RotDir}/${cdump}.${nyy}${nmm}${ndd}/${nhh}/${memdir}/hofx
+outputdir=${RotDir}/${cdump}.${nyy}${nmm}${ndd}/${nhh}/${memdir}/obs
 
 mkdir -p ${outputdir}
 
-outobs=${outputdir}/aod_nnr_${satID}_${obsstr}'.nc.ges'
+outobs=${outputdir}/aod_nnr_${satID}_hofx_3dvar_${obsstr}'.nc.ges'
 
 if [[ -e ${outobs} ]]; then
    ${nrm} ${outobs}

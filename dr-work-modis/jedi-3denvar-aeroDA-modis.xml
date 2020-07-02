@@ -14,7 +14,7 @@
 	-->
 
 	<!-- Experiment parameters such as name, starting, ending dates -->
-	<!ENTITY PSLOT "jedi-3denvar-aeroDA--modis">
+	<!ENTITY PSLOT "jedi-3denvar-aeroDA-modis">
 	<!ENTITY SDATE "201605311800">
 	<!ENTITY EDATE "201606040000">
 
@@ -42,6 +42,9 @@
 	<!ENTITY HOMEgfs  "/scratch1/BMC/gsd-fv3-dev/MAPP_2018/bhuang/JEDI-2020/JEDI-FV3/expCodes/GSDChem_cycling/global-workflow-clean">
 	<!ENTITY JOBS_DIR "&HOMEgfs;/jobs/rocoto">
 	<!ENTITY DMPDIR   "/scratch1/NCEPDEV/global/glopara/dump">
+
+	<!-- Directories for HPSS backup -->
+	<!ENTITY HPSSDIR "/BMC/fim/5year/MAPP_2018/bhuang/expRuns/">
 
 	<!-- Machine related entities -->
 	<!ENTITY ACCOUNT    "chem-var">
@@ -652,7 +655,10 @@
 	<envar><name>PDY</name><value><cyclestr>@Y@m@d</cyclestr></value></envar>
 	<envar><name>cyc</name><value><cyclestr>@H</cyclestr></value></envar>
 	<dependency>
-                <metataskdep metatask="gdasefmn"/>
+		<and>
+			<taskdep task="gdasfcst"/>
+                	<metataskdep metatask="gdasefmn"/>
+		</and>
 	</dependency>
 			
 </task>
@@ -765,6 +771,7 @@
 	<envar><name>HOMEjedi</name><value>&HOMEjedi;</value></envar>
 	<envar><name>EXPDIR</name><value>&EXPDIR;</value></envar>
 	<envar><name>ROTDIR</name><value>&ROTDIR;</value></envar>
+	<envar><name>HPSSDIR</name><value>&HPSSDIR;</value></envar>
 	<envar><name>CDATE</name><value><cyclestr>@Y@m@d@H</cyclestr></value></envar>
 	<envar><name>CDUMP</name><value>gdas</value></envar>
 	<envar><name>RUN_ENVIR</name><value>&RUN_ENVIR;</value></envar>
@@ -774,7 +781,7 @@
 	<envar><name>cyc</name><value><cyclestr>@H</cyclestr></value></envar>
 	<dependency>
 		<and>
-			<taskdep task="gdashxaodanl"/>
+			<!--taskdep task="gdashxaodanl"/-->
 			<metataskdep metatask="gdashxaod"/>
 		</and>
 	</dependency>

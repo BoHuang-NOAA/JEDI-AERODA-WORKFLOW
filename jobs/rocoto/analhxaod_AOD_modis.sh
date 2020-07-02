@@ -47,7 +47,6 @@ export JEDIUSH=${JEDIUSH:-$HOMEgfs/ush/JEDI/}
 CDATE=${CDATE:-"2001010100"}
 CDUMP=${CDUMP:-"gdas"}
 GDUMP=${GDUMP:-"gdas"}
-export CASE=${CASE:-"C96"}
 
 
 # Derived base variables
@@ -107,40 +106,50 @@ export NDATE=${ndate1}
 #done
 
 sensors="v.modis_terra v.modis_aqua"
+# do cntl analysis first
+export CASE=${CASE:-"C96"}
+export imem="-1"
 for sensor in ${sensors}; do
     export sensorID=${sensor}
-# do ensemble mean analysis first
-export imem="0"
-for n in $(seq 1 6); do
-  # create namelist from Python script  
-  export itile=$n
-  #$JEDIUSH/gen_nml_gocart_aod.py 
-  $JEDIUSH/gen_nml_gocart_anal_AOD_modis.sh
-  cat gocart_aod_fv3_mpi.nl
-  # run the executable
-  srun --export=all ./aod_fv3tile.x 
+    for n in $(seq 1 6); do
+        # create namelist from Python script  
+        export itile=$n
+        $JEDIUSH/gen_nml_gocart_anal_AOD_modis.sh
+        cat gocart_aod_fv3_mpi.nl
+        # run the executable
+        srun --export=all ./aod_fv3tile.x 
+    done
+    # compute H(x) and put it in the obs files
+    $JEDIUSH/setup_ens_aodhofx_anal_AOD_modis.sh
+    ./aod_ens_hofx.x
+    err=$?
+    if [ ${err} != 0 ]; then
+       exit ${err}
+    fi
+    /bin/rm -rf gocart_aod_fv3_mpi.nl fv3aod2obs.nl
 done
-# compute H(x) and put it in the obs files
-#$JEDIUSH/setup_ens_aodhofx.py
-$JEDIUSH/setup_ens_aodhofx_anal_AOD_modis.sh
-./aod_ens_hofx.x
 
-# do cntl analysis first
-/bin/rm -rf gocart_aod_fv3_mpi.nl fv3aod2obs.nl
-export imem="-1"
-for n in $(seq 1 6); do
-  # create namelist from Python script  
-  export itile=$n
-  #$JEDIUSH/gen_nml_gocart_aod.py 
-  $JEDIUSH/gen_nml_gocart_anal_AOD_modis.sh
-  cat gocart_aod_fv3_mpi.nl
-  # run the executable
-  srun --export=all ./aod_fv3tile.x 
-done
-# compute H(x) and put it in the obs files
-#$JEDIUSH/setup_ens_aodhofx.py
-$JEDIUSH/setup_ens_aodhofx_anal_AOD_modis.sh
-./aod_ens_hofx.x
+# do ensemble mean analysis first
+export CASE=${CASE_ENKF:-"C96"}
+export imem="0"
+for sensor in ${sensors}; do
+    export sensorID=${sensor}
+    for n in $(seq 1 6); do
+        # create namelist from Python script  
+        export itile=$n
+        $JEDIUSH/gen_nml_gocart_anal_AOD_modis.sh
+        cat gocart_aod_fv3_mpi.nl
+        # run the executable
+        srun --export=all ./aod_fv3tile.x 
+    done
+    # compute H(x) and put it in the obs files
+    $JEDIUSH/setup_ens_aodhofx_anal_AOD_modis.sh
+    ./aod_ens_hofx.x
+    err=$?
+    if [ ${err} != 0 ]; then
+       exit ${err}
+    fi
+    /bin/rm -rf gocart_aod_fv3_mpi.nl fv3aod2obs.nl
 done
 
 err=$?
