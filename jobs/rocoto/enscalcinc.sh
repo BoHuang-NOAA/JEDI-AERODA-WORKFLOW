@@ -54,6 +54,7 @@ typeset -Z3 fhr
 
 if [ $DO_CALC_INCREMENT = "YES" ]; then
 
+  mkdir -p $DATA
   cd $DATA
   mkdir -p enscalcinc.$$/grp${ENSGRP}
   cd enscalcinc.$$/grp${ENSGRP}

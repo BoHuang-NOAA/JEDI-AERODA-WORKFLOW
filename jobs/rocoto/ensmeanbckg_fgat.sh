@@ -74,8 +74,10 @@ mkdir -p $DATA && cd $DATA
 # source modules
 #source $HOMEgfs/sorc/gsi.fd/modulefiles/modulefile.ProdGSI.hera
 source /apps/lmod/7.7.18/init/ksh
-module use -a /scratch1/NCEPDEV/da/Daniel.Holdaway/opt/modulefiles
-module load apps/jedi/intel-19.0.5.281
+#module use -a /scratch1/NCEPDEV/da/Daniel.Holdaway/opt/modulefiles
+#module load apps/jedi/intel-19.0.5.281
+module use -a /scratch1/NCEPDEV/jcsda/Ryan.Honeyager/jedi/modules/
+module load jedi-stack/intel-impi-18.0.5
 module list
 
 
@@ -200,6 +202,7 @@ cd $pwd
 [[ $mkdata = "YES" ]] && rm -rf $DATA
 
 set +x
+#VERBOSE="YES"
 if [ $VERBOSE = "YES" ]; then
    echo $(date) EXITING $0 with return code $err >&2
 fi

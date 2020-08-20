@@ -94,8 +94,10 @@ $JEDIUSH/run_aero_3denvar_AOD_viirs.sh
 
 # run JEDI
 source /apps/lmod/7.7.18/init/ksh
-module use -a /scratch1/NCEPDEV/da/Daniel.Holdaway/opt/modulefiles
-module load apps/jedi/intel-19.0.5.281
+#module use -a /scratch1/NCEPDEV/da/Daniel.Holdaway/opt/modulefiles
+#module load apps/jedi/intel-19.0.5.281
+module use -a /scratch1/NCEPDEV/jcsda/Ryan.Honeyager/jedi/modules
+module load jedi-stack/intel-impi-18.0.5
 module list
 
 echo $LD_LIBRARY_PATH

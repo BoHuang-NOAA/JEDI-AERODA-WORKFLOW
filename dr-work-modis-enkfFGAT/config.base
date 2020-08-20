@@ -240,7 +240,7 @@ export FGAT3D_onlyCenter="FALSE" # TRUE or False
 if [[ "$CDUMP" == "gdas" ]] ; then
    export restart_interval_cntl=${FGAT3D_freq}  # 6 if FGAT3D=false
    export restart_interval_enkf=${FGAT3D_freq}  # 6 if FGAT3D=false
-   if [[ ${FGAT3D_onlyCenter} == "TRUE" ]]; then
+    if [ ${FGAT3D_onlyCenter} == "TRUE" -o ${FGAT3D} == "FALSE" ]; then
    	export restart_interval_cntl=6  # 6 if FGAT3D=false or FGAT3D_onlyCenter="TRUE"
    	export restart_interval_enkf=6  # 6 if FGAT3D=false or FGAT3D_onlyCenter="TRUE"
    fi

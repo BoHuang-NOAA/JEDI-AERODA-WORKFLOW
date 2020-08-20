@@ -1,6 +1,7 @@
 #!/bin/ksh
 set -x
 
+JEDIDir=${HOMEjedi:-$HOMEgfs/sorc/jedi.fd/}
 JEDIcrtm=${HOMEgfs}/fix/jedi_crtm_fix_20200413/CRTM_fix/Little_Endian/
 WorkDir=${DATA:-$pwd/hofx_aod.$$}
 RotDir=${ROTDIR:-/scratch1/BMC/gsd-fv3-dev/MAPP_2018/bhuang/JEDI-2020/JEDI-FV3/expRuns/aero_c96_jedi3densvar/dr-data/}
@@ -17,7 +18,9 @@ caseres=${CASE_ENKF:-C96}
 resc=$(echo $caseres |cut -c2-5)
 resx=$((resc+1))
 resy=$((resc+1))
-HOFXFGATEXEC=${HOMEgfs}/exec/fv3jedi_hofx_nomodel.x
+HOFXFGATEXEC=${JEDIDir}/bin/fv3jedi_hofx_nomodel.x
+FieldDir=${JEDIDir}/fv3-jedi/test/Data/fieldsets/
+FV3Dir=${JEDIDir}/fv3-jedi/test/Data/fv3files/
 #sensorID=${sensorID:-"Pass sensorID falied"};
 
 if [[ 0 -eq 1 ]]; then
@@ -140,7 +143,7 @@ while [ ${bkgtimest} -le ${bkgtimeed} ]; do
    echo "    filename_core: ${bkgdatestr1}.fv_core.res.nc" >> ${WorkDir}/bkgtmp.info
    echo "    filename_trcr: ${bkgdatestr1}.fv_tracer.res.nc" >> ${WorkDir}/bkgtmp.info
    echo "    filename_cplr: ${bkgdatestr1}.coupler.res" >> ${WorkDir}/bkgtmp.info
-   echo '    variables: ["T","DELP","sphum","sulf","bc1","bc2","oc1","oc2","dust1","dust2","dust3","dust4","dust5","seas1","seas2","seas3","seas4"]' >> ${WorkDir}/bkgtmp.info
+   echo '    state variables: [T,DELP,sphum,sulf,bc1,bc2,oc1,oc2,dust1,dust2,dust3,dust4,dust5,seas1,seas2,seas3,seas4]' >> ${WorkDir}/bkgtmp.info
    bkgtimest=$($NDATE ${bkgfreq} $bkgtimest)
 done
 
@@ -148,67 +151,64 @@ bkgfiles=`cat ${WorkDir}/bkgtmp.info`
 
 rm -rf ${WorkDir}/enkf_hofx_AOD_modis_fgat.yaml
 cat << EOF > ${WorkDir}/enkf_hofx_AOD_modis_fgat.yaml
-Assimilation Window:
-  window_begin: '${nm3datestr}'
-  window_length: PT6H
-Geometry:
-  nml_file_mpp: ${fgatfixdir}/fv3files/fmsmpp.nml
-  trc_file: ${fgatfixdir}/fv3files/field_table
-  akbk: ${WorkDir}/RESTART/${ndatestr1}.fv_core.res.nc
+window begin: '${nm3datestr}'
+window length: PT6H
+forecast length: PT1H
+geometry:
+  nml_file_mpp: ${FV3Dir}/fmsmpp.nml
+  trc_file: ${FV3Dir}/field_table
+  akbk: ${FV3Dir}/akbk64.nc4
   layout: [1,1]
   io_layout: [1,1]
   npx: ${resx}
   npy: ${resy}
   npz: 64
   ntiles: 6
-  FieldSets:
-    - FieldSet: ${fgatfixdir}/fieldsets/dynamics.yaml
-    - FieldSet: ${fgatfixdir}/fieldsets/aerosols_gfs.yaml
-    - FieldSet: ${fgatfixdir}/fieldsets/ufo.yaml
-Forecasts:
-  state:
+  fieldsets:
+    - fieldset: ${FieldDir}/dynamics.yaml
+    - fieldset: ${FieldDir}/aerosols_gfs.yaml
+    - fieldset: ${FieldDir}/ufo.yaml
+forecasts:
+  states:
 ${bkgfiles}
-Observations:
-  ObsTypes:
-  - ObsSpace:
-      name: Aod
-      ObsDataIn:
-        obsfile: ${obsin_terra}
-      ObsDataOut:
-        obsfile: ${hofx_terra}
-      simulate:
-        variables: [aerosol_optical_depth]
-        channels: 4
-    ObsOperator:
-      name: Aod
-      Absorbers: [H2O,O3]
-      ObsOptions:
-        Sensor_ID: v.modis_terra
-        EndianType: little_endian
-        CoefficientPath: ${CRTMFix}
-        AerosolOption: aerosols_gocart_default
-    Covariance:
-      covariance: diagonal
-  - ObsSpace:
-      name: Aod
-      ObsDataIn:
-        obsfile: ${obsin_aqua}
-      ObsDataOut:
-        obsfile: ${hofx_aqua}
-      simulate:
-        variables: [aerosol_optical_depth]
-        channels: 4
-    ObsOperator:
-      name: Aod
-      Absorbers: [H2O,O3]
-      ObsOptions:
-        Sensor_ID: v.modis_aqua
-        EndianType: little_endian
-        CoefficientPath: ${CRTMFix}
-        AerosolOption: aerosols_gocart_default
-    Covariance:
-      covariance: diagonal
-Prints:
+observations:
+- obs space:
+    name: Aod
+    obsdatain:
+      obsfile: ${obsin_terra}
+    obsdataout:
+      obsfile: ${hofx_terra}
+    simulated variables: [aerosol_optical_depth]
+    channels: 4
+  obs operator:
+    name: Aod
+    Absorbers: [H2O,O3]
+    obs options:
+      Sensor_ID: v.modis_terra
+      EndianType: little_endian
+      CoefficientPath: ${CRTMFix}
+      AerosolOption: aerosols_gocart_default
+  obs error:
+    covariance model: diagonal
+- obs space:
+    name: Aod
+    obsdatain:
+      obsfile: ${obsin_aqua}
+    obsdataout:
+      obsfile: ${hofx_aqua}
+    simulated variables: [aerosol_optical_depth]
+    channels: 4
+  obs operator:
+    name: Aod
+    Absorbers: [H2O,O3]
+    obs options:
+      Sensor_ID: v.modis_aqua
+      EndianType: little_endian
+      CoefficientPath: ${CRTMFix}
+      AerosolOption: aerosols_gocart_default
+  obs error:
+    covariance model: diagonal
+prints:
   frequency: PT3H
 EOF
 

@@ -81,23 +81,21 @@ module purge
 module use -a /scratch1/NCEPDEV/jcsda/Ryan.Honeyager/jedi/modules/
 module load jedi-stack/intel-impi-18.0.5
 
-#export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/scratch1/BMC/gsd-fv3-dev/MAPP_2018/pagowski/jedi/build/fv3-bundle/lib"
-#export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/scratch1/BMC/gsd-fv3-dev/MAPP_2018/bhuang/JEDI-2020/JEDI-FV3/expCodes/HxAod-Mariusz/JEDI-Bin-Mariusz/fv3-bundle_old/lib"
-export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/scratch1/BMC/gsd-fv3-dev/MAPP_2018/bhuang/JEDI-2020/JEDI-FV3/expCodes/fv3-bundle/V20200817/build/lib/"
-
+#export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/scratch1/BMC/gsd-fv3-dev/MAPP_2018/pagowski/jedi/build/fv3-bundle_old/lib"
+export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/scratch1/BMC/gsd-fv3-dev/MAPP_2018/bhuang/JEDI-2020/JEDI-FV3/expCodes/HxAod-Mariusz/JEDI-Bin-Mariusz/fv3-bundle_old/lib"
 export NDATE=${ndate1}
 
 # do ensemble mean
 if [ ${ENSGRP} -eq 1 ]; then
    export imem="0"
-   $JEDIUSH/enkf_hofx_AOD_modis_fgat.sh
+   $JEDIUSH/enkf_hofx_AOD_viirs_fgat.sh
    err=$?
    if [ $err != 0 ]; then
       exit $err
    fi
 
    export imem="-1"
-   $JEDIUSH/enkf_hofx_AOD_modis_fgat.sh
+   $JEDIUSH/enkf_hofx_AOD_viirs_fgat.sh
    err=$?
    if [ $err != 0 ]; then
       exit $err
@@ -109,7 +107,7 @@ fi
 if [ $NMEM_AERO -gt 0 ]; then
   for mem0 in {${ENSBEG}..${ENSEND}}; do
     export imem=$mem0
-    $JEDIUSH/enkf_hofx_AOD_modis_fgat.sh
+    $JEDIUSH/enkf_hofx_AOD_viirs_fgat.sh
   done
 fi
 

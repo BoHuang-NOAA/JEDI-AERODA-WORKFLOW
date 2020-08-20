@@ -82,8 +82,7 @@ module use -a /scratch1/NCEPDEV/jcsda/Ryan.Honeyager/jedi/modules/
 module load jedi-stack/intel-impi-18.0.5
 
 #export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/scratch1/BMC/gsd-fv3-dev/MAPP_2018/pagowski/jedi/build/fv3-bundle/lib"
-#export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/scratch1/BMC/gsd-fv3-dev/MAPP_2018/bhuang/JEDI-2020/JEDI-FV3/expCodes/HxAod-Mariusz/JEDI-Bin-Mariusz/fv3-bundle_old/lib"
-export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/scratch1/BMC/gsd-fv3-dev/MAPP_2018/bhuang/JEDI-2020/JEDI-FV3/expCodes/fv3-bundle/V20200817/build/lib/"
+export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/scratch1/BMC/gsd-fv3-dev/MAPP_2018/bhuang/JEDI-2020/JEDI-FV3/expCodes/HxAod-Mariusz/JEDI-Bin-Mariusz/fv3-bundle_old/lib"
 
 export NDATE=${ndate1}
 

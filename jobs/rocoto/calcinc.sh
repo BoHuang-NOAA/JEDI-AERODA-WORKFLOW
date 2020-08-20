@@ -49,6 +49,7 @@ typeset -Z3 fhr
 
 if [ $DO_CALC_INCREMENT = "YES" ]; then
 
+  mkdir -p $DATA
   cd $DATA
   mkdir -p calcinc.$$
   cd calcinc.$$
@@ -62,6 +63,7 @@ if [ $DO_CALC_INCREMENT = "YES" ]; then
   # deterministic run first
 
   export OMP_NUM_THREADS=$NTHREADS_CALCINC
+  mkdir -p $ROTDIR/$CDUMP.$PDY/$cyc/$mem/
   $NLN $ROTDIR/$CDUMP.$HISDAY/${HIScyc}/${CDUMP}.t${HIScyc}z.atmf${fhr}$SUFFIX.ges atmges_mem001
   $NLN $ICSDIR/${CASE}/$CDUMP.$PDY/$cyc/$mem/$CDUMP.$cycle.atmanl$SUFFIX atmanl_mem001
   $NLN $ROTDIR/$CDUMP.$PDY/$cyc/$mem/$CDUMP.$cycle.atminc.nc atminc_mem001

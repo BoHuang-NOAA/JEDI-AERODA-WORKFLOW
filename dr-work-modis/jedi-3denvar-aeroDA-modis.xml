@@ -37,7 +37,7 @@
 	<!ENTITY GBBDIR "&TOPICDIR;/GBBEPx/C96_Li_Copy20200407/">
 
 	<!-- Directories for driving the workflow -->
-	<!ENTITY HOMEjedi "/scratch1/BMC/gsd-fv3-dev/MAPP_2018/bhuang/JEDI-2020/JEDI-FV3/expCodes/fv3-bundle/build">
+	<!ENTITY HOMEjedi "/scratch1/BMC/gsd-fv3-dev/MAPP_2018/bhuang/JEDI-2020/JEDI-FV3/expCodes/fv3-bundle/V20200817/build/">
 	<!--ENTITY HOMEjedi "/scratch1/NCEPDEV/da/Cory.R.Martin/JEDI/fv3-bundle/buildscripts/build-intel-19.0.5.281-release-default"-->
 	<!ENTITY HOMEgfs  "/scratch1/BMC/gsd-fv3-dev/MAPP_2018/bhuang/JEDI-2020/JEDI-FV3/expCodes/GSDChem_cycling/global-workflow-clean">
 	<!ENTITY JOBS_DIR "&HOMEgfs;/jobs/rocoto">
