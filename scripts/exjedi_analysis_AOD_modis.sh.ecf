@@ -94,7 +94,6 @@ $JEDIUSH/run_aero_3denvar_AOD_modis.sh
 
 # run JEDI
 source /apps/lmod/7.7.18/init/ksh
-module purge
 #module use -a /scratch1/NCEPDEV/da/Daniel.Holdaway/opt/modulefiles
 #module load apps/jedi/intel-19.0.5.281
 module purge
