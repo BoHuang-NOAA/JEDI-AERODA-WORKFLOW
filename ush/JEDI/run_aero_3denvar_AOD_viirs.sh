@@ -291,7 +291,7 @@ while [ ${iproc} -le 5 ]; do
    #${nln} ${hofxout_aqua} ${hofx_aqua}
 
    hofxout_viirs=${analroot}"/aod_viirs_hofx_3dvar_"${obsstr}"_"${procstr}".nc4"
-   hofx_aqua=${WorkDir}"/aod_viirs_3dvar_"${obsstr}"_"${procstr}".nc4"
+   hofx_viirs=${WorkDir}"/aod_viirs_3dvar_"${obsstr}"_"${procstr}".nc4"
    ${nln} ${hofxout_viirs} ${hofx_viirs}
 
    iproc=$((iproc+1))
