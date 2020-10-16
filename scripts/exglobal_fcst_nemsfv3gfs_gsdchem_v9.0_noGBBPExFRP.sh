@@ -210,6 +210,7 @@ if [ -f $gmemdir/RESTART/${PDY}.${cyc}0000.coupler.res -o -f $gmemdir/RESTART/${
 	    if [ ! -f $gmemdir/RESTART/${PDY}.${cyc}0000.fv_tracer.res.tile${n}.nc ]; then
 	       tracer_da2fcst="NO"
 	       ${NLN} $gmemdir/RESTART/${PDY}.${cyc}0000.fv_tracer.res.tile${n}.nc.ges $gmemdir/RESTART/${PDY}.${cyc}0000.fv_tracer.res.tile${n}.nc
+	    else
 	       ${NMV} $gmemdir/RESTART/${PDY}.${cyc}0000.fv_core.res.tile${n}.nc $gmemdir/RESTART/${PDY}.${cyc}0000.fv_core.res.tile${n}.nc.aeroDAoutput
 	    fi
 	    ${NLN} $gmemdir/RESTART/${PDY}.${cyc}0000.fv_core.res.tile${n}.nc.ges $gmemdir/RESTART/${PDY}.${cyc}0000.fv_core.res.tile${n}.nc
@@ -218,6 +219,9 @@ if [ -f $gmemdir/RESTART/${PDY}.${cyc}0000.coupler.res -o -f $gmemdir/RESTART/${
 	    ${NLN} $gmemdir/RESTART/${PDY}.${cyc}0000.fv_srf_wnd.res.tile${n}.nc.ges $gmemdir/RESTART/${PDY}.${cyc}0000.fv_srf_wnd.res.tile${n}.nc
 	done
 	gesln_clean="YES"
+     else
+	echo "Exit due to missing IC files"
+	exit $?
      fi
   fi
 fi

@@ -7,7 +7,7 @@ assimilation of viirs and modis AOD observation on Hera machine
 	(0.1) In this package, fix and exec dicrectories were linked to their corresponding directories at 
 	/scratch1/BMC/gsd-fv3-dev/MAPP_2018/bhuang/JEDI-2020/JEDI-FV3/expCodes/GSDChem_cycling/global-workflow
 	(0.2) All the hard linked files in the scripts/codes are available at Hera. 
-	(0.3) Additional functions are undevelopment and will be integrated into this package as along. The following 
+	(0.3) Additional functions are under development and will be integrated into this package as along. The following 
 	      steps introduce the general steps of preparing and setting up, running this workflow. 
 
 (1) Prepare IC for the first cycle during the model spin-up
@@ -71,8 +71,10 @@ assimilation of viirs and modis AOD observation on Hera machine
 			(f9)  gdasemean: calculate background ensemble emean;
                         (f10) seasbinfcst2da: change the sea salt bin orders from FV3 model to the GOCART model for the 
 			          envar and enkf update in next cycle;
-			(c11) gdashxaod: calculate AOD hofx of control and ensemble aerosol background.
-			(c12) cleandata: clean up unnecessary data and backup to HPSS.
+			(f11) gdashxaod: calculate AOD hofx of control and ensemble aerosol background;
+			(f12) gdashxaodfgat: calculate FGAT AOD hofx of control and ensemble aerosol background which will 
+			          be used in gdaseupd with FGAT in (f4);
+			(f13) cleandata: clean up unnecessary data and backup to HPSS.
 
 		(4.2.g) To configure your own experiment, please modify accordingly in the configuration files 
 			(e.g., config.base, config.anal, etc). 

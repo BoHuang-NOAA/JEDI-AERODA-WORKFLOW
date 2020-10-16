@@ -27,7 +27,7 @@
 	<!ENTITY TOPRUNDIR "/scratch2/BMC/gsd-fv3-dev/MAPP_2018/bhuang/JEDI-2020/JEDI-FV3/expRuns"> 
 	<!ENTITY TOPICDIR "/scratch1/BMC/gsd-fv3-dev/MAPP_2018/bhuang/JEDI-2020/JEDI-FV3/dataSets">
 	<!--ENTITY TOPOBSDIR "/scratch1/BMC/wrf-chem/pagowski/MAPP_2018/OBS/VIIRS/AOT/thinned_"-->
-	<!ENTITY TOPOBSDIR  "/scratch1/BMC/gsd-fv3-dev/MAPP_2018/bhuang/JEDI-2020/JEDI-FV3/dataSets/NNR_AOD_Obs/2016Case/thinned_C192/">
+	<!ENTITY TOPOBSDIR  "/scratch1/BMC/gsd-fv3-dev/MAPP_2018/bhuang/JEDI-2020/JEDI-FV3/dataSets/NNR_AOD_Obs/2016Case/thinned_debiased_C192/">
 
 	<!-- Experiment and Rotation directory -->
 	<!ENTITY EXPDIR "&TOPRUNDIR;/&PSLOT;/dr-work/">

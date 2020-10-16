@@ -1,0 +1,713 @@
+18a19
+> # 2019-03-05  Rahul Mahajan  Implemented IAU
+75,79d75
+<  OUTTIME=$(( $FHOUT*3600/ $DELTIM ))
+<  
+< if [ $imp_physics -eq 99 ]; then NTRACER=0; fi
+< if [ $imp_physics -eq 11 ]; then NTRACER=1; fi
+< 
+92a89,94
+> # IAU options
+> DOIAU=${DOIAU:-"NO"}
+> IAUFHRS=${IAUFHRS:-0}
+> IAU_DELTHRS=${IAU_DELTHRS:-0}
+> IAU_OFFSET=${IAU_OFFSET:-0}
+> 
+108d109
+< CPL=${CPL:-".true."}
+117d117
+< 
+137c137
+<    mkdata=YES
+---
+> #   mkdata=YES #lzhang do not clean the RUNDIR
+139a140,146
+> 
+> # Stage the FV3 initial conditions to ROTDIR  
+> export OUTDIR="$ICSDIR/$CDATE/$CDUMP/$CASE/INPUT" #lzhang
+> COMOUT="$ROTDIR/$CDUMP.$PDY/$cyc"
+> [[ ! -d $COMOUT ]] && mkdir -p $COMOUT
+> cd $COMOUT || exit 99
+> [[ ! -d $INPUT ]] && $NLN $OUTDIR .
+141a149
+> 
+142a151
+> #lzhang we do not need so much restart file in the output
+191c200
+< #gmemdir=$ROTDIR/${rprefix}.$gPDY/$gcyc/$memchar
+---
+> #gmemdir=$ROTDIR/${rprefix}.$gPDY/$gcyc/$memchar !lzhang
+192a202,212
+> sCDATE=$($NDATE -3 $CDATE)
+> 
+> if [[ "$DOIAU" = "YES" ]]; then
+>   sCDATE=$($NDATE -3 $CDATE)
+>   sPDY=$(echo $sCDATE | cut -c1-8)
+>   scyc=$(echo $sCDATE | cut -c9-10)
+> else
+>   sCDATE=$CDATE
+>   sPDY=$PDY
+>   scyc=$cyc
+> fi
+197d216
+< read_increment=${read_increment:-".false."}
+198a218,219
+> read_increment=${read_increment:-".false."}
+> res_latlon_dynamics="''"
+204,226c225,262
+<   export warm_start=".true."
+<   if [ ! -f $gmemdir/RESTART/${PDY}.${cyc}0000.coupler.res ]; then
+<      if [ -f $gmemdir/RESTART/${PDY}.${cyc}0000.coupler.res.ges ]; then
+<         ${NLN} $gmemdir/RESTART/${PDY}.${cyc}0000.coupler.res.ges $gmemdir/RESTART/${PDY}.${cyc}0000.coupler.res
+<         ${NLN} $gmemdir/RESTART/${PDY}.${cyc}0000.fv_core.res.nc.ges $gmemdir/RESTART/${PDY}.${cyc}0000.fv_core.res.nc
+< 	for n in $(seq 1 $ntiles); do
+< 	    if [ ! -f $gmemdir/RESTART/${PDY}.${cyc}0000.fv_tracer.res.tile${n}.nc ]; then
+< 	       tracer_da2fcst="NO"
+< 	       ${NLN} $gmemdir/RESTART/${PDY}.${cyc}0000.fv_tracer.res.tile${n}.nc.ges $gmemdir/RESTART/${PDY}.${cyc}0000.fv_tracer.res.tile${n}.nc
+< 	    else
+< 	       ${NMV} $gmemdir/RESTART/${PDY}.${cyc}0000.fv_core.res.tile${n}.nc $gmemdir/RESTART/${PDY}.${cyc}0000.fv_core.res.tile${n}.nc.aeroDAoutput
+< 	    fi
+< 	    ${NLN} $gmemdir/RESTART/${PDY}.${cyc}0000.fv_core.res.tile${n}.nc.ges $gmemdir/RESTART/${PDY}.${cyc}0000.fv_core.res.tile${n}.nc
+< 	    ${NLN} $gmemdir/RESTART/${PDY}.${cyc}0000.phy_data.tile${n}.nc.ges $gmemdir/RESTART/${PDY}.${cyc}0000.phy_data.tile${n}.nc
+< 	    ${NLN} $gmemdir/RESTART/${PDY}.${cyc}0000.sfc_data.tile${n}.nc.ges $gmemdir/RESTART/${PDY}.${cyc}0000.sfc_data.tile${n}.nc
+< 	    ${NLN} $gmemdir/RESTART/${PDY}.${cyc}0000.fv_srf_wnd.res.tile${n}.nc.ges $gmemdir/RESTART/${PDY}.${cyc}0000.fv_srf_wnd.res.tile${n}.nc
+< 	done
+< 	gesln_clean="YES"
+<      else
+< 	echo "Exit due to missing IC files"
+< 	exit $?
+<      fi
+<   fi
+---
+>     export warm_start=".true."
+>     if [ ! -f $gmemdir/RESTART/${PDY}.${cyc}0000.coupler.res ]; then
+>         if [ -f $gmemdir/RESTART/${PDY}.${cyc}0000.coupler.res.ges ]; then
+> 	    ${NLN} $gmemdir/RESTART/${PDY}.${cyc}0000.coupler.res.ges $gmemdir/RESTART/${PDY}.${cyc}0000.coupler.res
+> 	    ${NLN} $gmemdir/RESTART/${PDY}.${cyc}0000.fv_core.res.nc.ges $gmemdir/RESTART/${PDY}.${cyc}0000.fv_core.res.nc
+> 	    for n in $(seq 1 $ntiles); do
+> 	        if [ ! -f $gmemdir/RESTART/${PDY}.${cyc}0000.fv_tracer.res.tile${n}.nc ]; then
+> 		    tracer_da2fcst="NO"
+> 		    ${NLN} $gmemdir/RESTART/${PDY}.${cyc}0000.fv_tracer.res.tile${n}.nc.ges $gmemdir/RESTART/${PDY}.${cyc}0000.fv_tracer.res.tile${n}.nc
+> 		else
+> 		    ${NMV} $gmemdir/RESTART/${PDY}.${cyc}0000.fv_core.res.tile${n}.nc $gmemdir/RESTART/${PDY}.${cyc}0000.fv_core.res.tile${n}.nc.aeroDAoutput
+> 		fi
+> 		${NLN} $gmemdir/RESTART/${PDY}.${cyc}0000.fv_core.res.tile${n}.nc.ges $gmemdir/RESTART/${PDY}.${cyc}0000.fv_core.res.tile${n}.nc
+> 		${NLN} $gmemdir/RESTART/${PDY}.${cyc}0000.phy_data.tile${n}.nc.ges $gmemdir/RESTART/${PDY}.${cyc}0000.phy_data.tile${n}.nc
+> 		${NLN} $gmemdir/RESTART/${PDY}.${cyc}0000.sfc_data.tile${n}.nc.ges $gmemdir/RESTART/${PDY}.${cyc}0000.sfc_data.tile${n}.nc
+> 		${NLN} $gmemdir/RESTART/${PDY}.${cyc}0000.fv_srf_wnd.res.tile${n}.nc.ges $gmemdir/RESTART/${PDY}.${cyc}0000.fv_srf_wnd.res.tile${n}.nc
+> 	    done
+> 	    gesln_clean="YES"
+> 	else
+> 	    echo "Exit due to missing IC files"
+> 	    exit $?
+> 	fi
+>     fi
+> fi
+> 
+> # turn IAU off for cold start
+> DOIAU_coldstart="NO"
+> if [ $DOIAU = "YES" -a $warm_start = ".false." ]; then
+>   export DOIAU="NO"
+>   echo "turning off IAU since warm_start = $warm_start"
+>   DOIAU_coldstart="YES"
+>   IAU_OFFSET=0
+>   sCDATE=$CDATE
+>   sPDY=$PDY
+>   scyc=$cyc
+>   #echo "ERROR: DOIAU = $DOIAU and warm_start = $warm_start are incompatible."
+>   #echo "Abort!"
+>   #exit 99
+237d272
+<   # CRM - temporary to get cycling without DOGCYCLE
+239c274
+<   for file in $gmemdir/RESTART/${PDY}.${cyc}0000.*.nc; do
+---
+>   for file in $gmemdir/RESTART/${sPDY}.${scyc}0000.*.nc; do
+243c278
+<     #if [ $fsuf != "sfc_data" ]; then
+---
+>     if [ $fsuf != "sfc_data" ]; then
+245c280
+<     #fi
+---
+>     fi
+249,267c284
+<   #for file in $memdir/RESTART/${PDY}.${cyc}0000.*.nc; do
+<   #  file2=$(echo $(basename $file))
+<   #  file2=$(echo $file2 | cut -d. -f3-) # remove the date from file
+<   #  fsufanl=$(echo $file2 | cut -d. -f1)
+<   #  if [ $fsufanl = "sfcanl_data" ]; then
+<   #    file2=$(echo $file2 | sed -e "s/sfcanl_data/sfc_data/g")
+<   #    $NLN $file $DATA/INPUT/$file2
+<   #  fi
+<   #done
+<   
+<    cd $DATA
+< 
+<   # Handle coupler.res file for DA cycling
+<   if [ ${USE_COUPLER_RES:-"NO"} = "YES" ]; then
+<     # In DA, this is not really a "true restart",
+<     # and the model start time is the analysis time
+<     # The alternative is to replace
+<     # model start time with current model time in coupler.res
+<     file=$gmemdir/RESTART/${PDY}.${cyc}0000.coupler.res
+---
+>   for file in $memdir/RESTART/${sPDY}.${scyc}0000.*.nc; do
+270c287,305
+<     $NLN $file $DATA/INPUT/$file2
+---
+>     fsufanl=$(echo $file2 | cut -d. -f1)
+>     if [ $fsufanl = "sfcanl_data" ]; then
+>       file2=$(echo $file2 | sed -e "s/sfcanl_data/sfc_data/g")
+>       $NLN $file $DATA/INPUT/$file2
+>     fi
+>   done
+> #lzhang cp atminc.nc to output dir
+>    cd $DATA
+>    $NCP ../calcinc/atminc.nc $memdir/${CDUMP}.t${cyc}z.atminc.nc
+> 
+> 
+>   # Need a coupler.res when doing IAU
+>   if [ $DOIAU = "YES" ]; then
+>     rm -f $DATA/INPUT/coupler.res
+>     cat >> $DATA/INPUT/coupler.res << EOF
+>      2        (Calendar: no_calendar=0, thirty_day_months=1, julian=2, gregorian=3, noleap=4)
+>   ${gPDY:0:4}  ${gPDY:4:2}  ${gPDY:6:2}  ${gcyc}     0     0        Model start time:   year, month, day, hour, minute, second
+>   ${sPDY:0:4}  ${sPDY:4:2}  ${sPDY:6:2}  ${scyc}     0     0        Current model time: year, month, day, hour, minute, second
+> EOF
+273,279c308,324
+<   increment_file=$memdir/${CDUMP}.t${cyc}z.atminc.nc 
+<   #increment_file=$gmemdir/${CDUMP}.t${cyc}z.atminc.nc
+<   if [ -f $increment_file ]; then
+<     $NLN $increment_file $DATA/INPUT/fv3_increment.nc
+<     read_increment=".true."
+<     res_latlon_dynamics="fv3_increment.nc"
+<   else
+---
+>   # Link increments
+>   if [ $DOIAU = "YES" ]; then
+>     for i in $(echo $IAUFHRS | sed "s/,/ /g" | rev); do
+>       incfhr=$(printf %03i $i)
+>       if [ $incfhr = "006" ]; then
+>         increment_file=$memdir/${CDUMP}.t${cyc}z.atminc.nc
+>       else
+>         increment_file=$memdir/${CDUMP}.t${cyc}z.atmi${incfhr}.nc
+>       fi
+>       if [ ! -f $increment_file ]; then
+>         echo "ERROR: DOIAU = $DOIAU, but missing increment file for fhr $incfhr at $increment_file"
+>         echo "Abort!"
+>         exit 1
+>       fi
+>       $NLN $increment_file $DATA/INPUT/fv_increment$i.nc
+>       IAU_INC_FILES="'fv_increment$i.nc',$IAU_INC_FILES"
+>     done
+281c326,333
+<     res_latlon_dynamics="''"
+---
+>     res_latlon_dynamics=""
+>   else
+>     increment_file=$memdir/${CDUMP}.t${cyc}z.atminc.nc
+>     if [ -f $increment_file ]; then
+>       $NLN $increment_file $DATA/INPUT/fv_increment.nc
+>       read_increment=".true."
+>       res_latlon_dynamics="fv_increment.nc"
+>     fi
+284,290c336,342
+< #  for file in $memdir/INPUT/*.nc; do
+< #    file2=$(echo $(basename $file))
+< #    fsuf=$(echo $file2 | cut -c1-3)
+< #    if [ $fsuf = $fsuf = "sfc" ]; then
+< #      $NLN $file $DATA/INPUT/$file2
+< #    fi
+< #  done
+---
+>   for file in $memdir/INPUT/*.nc; do
+>     file2=$(echo $(basename $file))
+>     fsuf=$(echo $file2 | cut -c1-3)
+>     if [ $fsuf = $fsuf = "sfc" ]; then
+>       $NLN $file $DATA/INPUT/$file2
+>     fi
+>   done
+294a347
+>     export warm_start=".true."
+299c352
+<       file2=$(echo $file2 | cut -d. -f3-)
+---
+>       file2=$(echo $file2 | cut -d. -f3-) 
+304a358
+> 
+320d373
+< 
+328a382,389
+> # If doing IAU, change forecast hours
+> if [[ "$DOIAU" = "YES" ]]; then
+>   FHMAX=$((FHMAX+6))
+>   if [ $FHMAX_HF -gt 0 ]; then
+>      FHMAX_HF=$((FHMAX_HF+6))
+>   fi
+> fi
+> 
+338,341d398
+< 
+< IALB=${IALB:-1}
+< IEMS=${IEMS:-1}
+< ISOL=${ISOL:-2}
+369a427,432
+> #link GSDChem input files   !lzhang
+> if [ $GSDChem -gt 0 ] ; then
+>   for file in $(ls $DATA/../prep/*.nc) ; do
+>     $NLN $file $DATA/INPUT/$(echo $(basename $file))
+>   done
+> fi
+384a448,450
+> if [ $LATB_CASE -eq 192 ]; then
+>   LATB_CASE=190 # berror file is at this resolution
+> fi
+403c469
+< FNMSKH=${FNMSKH:-"$FIX_AM/seaice_newland.grb"}
+---
+> FNMSKH=${FNMSKH:-"$FIX_AM/global_slmask.t1534.3072.1536.grb"}
+526c592
+<     res_latlon_dynamics="fv3_increment.nc"
+---
+>     res_latlon_dynamics="fv_increment.nc"
+557,564c623,631
+< # build the date for curr_date and diag_table from CDATE
+< SYEAR=$(echo  $CDATE | cut -c1-4)
+< SMONTH=$(echo $CDATE | cut -c5-6)
+< SDAY=$(echo   $CDATE | cut -c7-8)
+< SHOUR=$(echo  $CDATE | cut -c9-10)
+< curr_date="${SYEAR},${SMONTH},${SDAY},${SHOUR},0,0"
+< rsecs=$((restart_interval*3600))
+< restart_secs=${rsecs:-0}
+---
+> if [ $DO_SKEB = "YES" ]; then
+>     do_skeb=".true."
+> fi
+> if [ $DO_SHUM = "YES" ]; then
+>     do_shum=".true."
+> fi
+> if [ $DO_SPPT = "YES" ]; then
+>     do_sppt=".true."
+> fi
+571a639,645
+> if [ $DOIAU = "YES" ]; then
+> cat > diag_table << EOF
+> FV3 Forecast
+> ${gPDY:0:4} ${gPDY:4:2} ${gPDY:6:2} ${gcyc} 0 0
+> EOF
+> cat $DIAG_TABLE >> diag_table
+> else
+574c648
+< $SYEAR $SMONTH $SDAY $SHOUR 0 0
+---
+> ${sPDY:0:4} ${sPDY:4:2} ${sPDY:6:2} ${scyc} 0 0
+576a651
+> fi
+584,600c659,660
+< EARTH_component_list: ATM CHM
+< EARTH_attributes::
+<   Verbosity = 0
+< ::
+< 
+< ATM_model:                      fv3
+< ATM_petlist_bounds:             -1 -1
+< ATM_attributes::
+<   Verbosity = 0
+< ::
+< 
+< CHM_model:                      gsdchem
+< CHM_petlist_bounds:             -1 -1
+< CHM_attributes::
+<   Verbosity = 0
+< ::
+< 
+---
+> EARTH_component_list: ATM
+> ATM_model:            fv3
+602,608c662
+<   @$DELTIM
+<     ATM phase1
+<     ATM -> CHM
+<     CHM
+<     CHM -> ATM
+<     ATM phase2
+<   @
+---
+>   ATM
+612a667
+> if [[ "$DOIAU" = "YES" ]]; then
+617,620c672,675
+< start_year:              $SYEAR
+< start_month:             $SMONTH
+< start_day:               $SDAY
+< start_hour:              $SHOUR
+---
+> start_year:              ${gPDY:0:4}
+> start_month:             ${gPDY:4:2}
+> start_day:               ${gPDY:6:2}
+> start_hour:              ${gcyc}
+627a683
+> output_1st_tstep_rst:    .false.
+629c685
+< cpl:                     $CPL
+---
+> cpl:                     ${cpl:-".false."}
+634a691,727
+> 
+> quilting:                $QUILTING
+> write_groups:            ${WRITE_GROUP:-1}
+> write_tasks_per_group:   ${WRTTASK_PER_GROUP:-24}
+> num_files:               ${NUM_FILES:-2}
+> filename_base:           'atm' 'sfc'
+> output_grid:             $OUTPUT_GRID
+> output_file:             $OUTPUT_FILE
+> ideflate:                ${ideflate:-1}
+> nbits:                   ${nbits:-14}
+> write_nemsioflip:        $WRITE_NEMSIOFLIP
+> write_fsyncflag:         $WRITE_FSYNCFLAG
+> imo:                     $LONB_IMO
+> jmo:                     $LATB_JMO
+> 
+> nfhout:                  $FHOUT
+> nfhmax_hf:               $FHMAX_HF
+> nfhout_hf:               $FHOUT_HF
+> nsout:                   $NSOUT
+> iau_offset:              ${IAU_OFFSET}
+> EOF
+> else
+> cat > model_configure <<EOF
+> total_member:            $ENS_NUM
+> print_esmf:              ${print_esmf:-.true.}
+> PE_MEMBER01:             $NTASKS_FV3
+> start_year:              ${sPDY:0:4}
+> start_month:             ${sPDY:4:2}
+> start_day:               ${sPDY:6:2}
+> start_hour:              ${scyc}
+> start_minute:            0
+> start_second:            0
+> nhours_fcst:             $FHMAX
+> RUN_CONTINUE:            ${RUN_CONTINUE:-".false."}
+> ENS_SPS:                 ${ENS_SPS:-".false."}
+> 
+> dt_atmos:                $DELTIM
+635a729,735
+> calendar:                ${calendar:-'julian'}
+> cpl:                     ${cpl:-".false."}
+> memuse_verbose:          ${memuse_verbose:-".false."}
+> atmos_nthreads:          $NTHREADS_FV3
+> use_hyper_thread:        ${hyperthread:-".false."}
+> ncores_per_node:         $cores_per_node
+> restart_interval:        $restart_interval
+640d739
+< output_history:          ${OUTPUT_HISTORY:-".true."}
+655a755
+> iau_offset:              ${IAU_OFFSET}
+656a757
+> fi
+688a790
+>   ccpp_suite = $CCPP_SUITE
+707a810
+> 
+791a895,910
+> &cires_ugwp_nml
+>        knob_ugwp_solver  = ${knob_ugwp_solver:-2}
+>        knob_ugwp_source  = ${knob_ugwp_source:-1,1,0,0}
+>        knob_ugwp_wvspec  = ${knob_ugwp_wvspec:-1,25,25,25}
+>        knob_ugwp_azdir   = ${knob_ugwp_azdir:-2,4,4,4}
+>        knob_ugwp_stoch   = ${knob_ugwp_stoch:-0,0,0,0}
+>        knob_ugwp_effac   = ${knob_ugwp_effac:-1,1,1,1}
+>        knob_ugwp_doaxyz  = ${knob_ugwp_doaxyz:-1}
+>        knob_ugwp_doheat  = ${knob_ugwp_doheat:-1}
+>        knob_ugwp_dokdis  = ${knob_ugwp_dokdis:-1}
+>        knob_ugwp_ndx4lh  = ${knob_ugwp_ndx4lh:-1}
+>        knob_ugwp_version = ${knob_ugwp_version:-0}
+>        launch_level      = ${launch_level:-54}                   
+> /
+> 
+> 
+813,814c932,933
+<   ialb         = $IALB
+<   iems         = $IEMS
+---
+>   ialb         = ${IALB:-"1"}
+>   iems         = ${IEMS:-"1"}
+815a935,937
+>   icliq_sw     = ${icliq_sw:-"2"}
+>   iovr_lw      = ${iovr_lw:-"3"}
+>   iovr_sw      = ${iovr_sw:-"3"}
+819c941
+<   isol         = $ISOL
+---
+>   isol         = ${ISOL:-"2"}
+827a950,952
+>   satmedmf     = ${satmedmf-".false."}
+>   isatmedmf    = ${isatmedmf-"1"}
+>   lheatstrg    = ${lheatstrg-".true."}
+836a962,975
+>   lsoil        = ${lsoil:-"4"}
+>   lsm          = ${lsm:-"2"}
+>   iopt_dveg    = ${iopt_dveg:-"1"}
+>   iopt_crs     = ${iopt_crs:-"1"}
+>   iopt_btr     = ${iopt_btr:-"1"}
+>   iopt_run     = ${iopt_run:-"1"}
+>   iopt_sfc     = ${iopt_sfc:-"1"}
+>   iopt_frz     = ${iopt_frz:-"1"}
+>   iopt_inf     = ${iopt_inf:-"1"}
+>   iopt_rad     = ${iopt_rad:-"1"}
+>   iopt_alb     = ${iopt_alb:-"2"}
+>   iopt_snf     = ${iopt_snf:-"4"}
+>   iopt_tbot    = ${iopt_tbot:-"2"}
+>   iopt_stc     = ${iopt_stc:-"1"}
+837a977,978
+>   oz_phys      = ${oz_phys:-".false."}
+>   oz_phys_2015 = ${oz_phys_2015:-".true."}
+839,840d979
+<   cplflx       = .false.
+<   cplchm       = .true.
+845a985,990
+>   ldiag_ugwp   = ${ldiag_ugwp:-".false."}
+>   do_ugwp      = ${do_ugwp:-".true."}
+>   do_tofd      = ${do_tofd:-".true."}
+>   do_sppt      = ${do_sppt:-".false."}
+>   do_shum      = ${do_shum:-".false."}
+>   do_skeb      = ${do_skeb:-".false."}
+846a992,1036
+>   aer_bc_opt=1
+>   aer_ic_opt=1
+>   aer_ra_feedback=0
+>   aer_ra_frq=0
+>   aerchem_onoff=1
+>   bio_emiss_opt=0
+>   biomass_burn_opt=1
+>   chem_conv_tr=0
+>   chem_in_opt=$CHEMIN
+>   chem_opt=300
+>   chemdt=3
+>   cldchem_onoff=0
+>   dmsemis_opt=1
+>   dust_opt=5
+>   dust_alpha = 2.0
+>   dust_gamma = 1.8
+>   dust_calcdrag=1
+>   emiss_inpt_opt=1
+>   emiss_opt=5
+>   gas_bc_opt=1
+>   gas_ic_opt=1
+>   gaschem_onoff=1
+>   kemit=1
+>   plumerisefire_frq=60
+>   PLUMERISE_flag=$EMITYPE
+>   seas_opt=2
+>   seas_emis_scheme=-1
+>   seas_emis_scale=1.,1.,1.,1.,1.
+>   vertmix_onoff=1
+>   aer_ra_frq     = 60
+>   wetdep_ls_opt  = 1
+>   restart_inname    = "$DATA/INPUT/"
+>   restart_outname   = "$RSTDIR_TMP/"
+> EOF
+> 
+> # Add namelist for IAU
+> if [ $DOIAU = "YES" ]; then
+>   cat >> input.nml << EOF
+>   iaufhrs      = ${IAUFHRS}
+>   iau_delthrs  = ${IAU_DELTHRS}
+>   iau_inc_files= ${IAU_INC_FILES}
+> EOF
+> fi
+> 
+> cat >> input.nml <<EOF
+848a1039
+> EOF
+849a1041,1043
+> echo "" >> input.nml
+> 
+> cat >> input.nml <<EOF
+896a1091
+>   reiflag = ${reiflag:-"2"}
+930a1126
+>   LANDICE  = ${landice:-".true."}
+948,988d1143
+< &chem_nml
+<   aer_bc_opt=1
+<   aer_ic_opt=1
+<   aer_ra_feedback=0
+<   aerchem_onoff=1
+<   bio_emiss_opt=0
+<   biomass_burn_opt=1
+<   chem_conv_tr=0
+<   chem_in_opt=$CHEMIN
+<   chem_opt=300
+<   chemdt=3
+<   cldchem_onoff=0
+<   dmsemis_opt=1
+<   dust_opt=5
+<   dust_alpha = 2.0
+<   dust_gamma = 1.8
+<   dust_calcdrag=1
+<   emiss_inpt_opt=1
+<   emiss_opt=5
+<   gas_bc_opt=1
+<   gas_ic_opt=1
+<   gaschem_onoff=1
+<   kemit=1
+<   phot_opt=1
+<   photdt=60
+<   plumerisefire_frq=60
+<   PLUMERISE_flag=$EMITYPE
+<   seas_opt=2
+<   seas_emis_scheme=-1
+<   seas_emis_scale=1.,1.,1.,1.,1.
+<   vertmix_onoff=1
+<   gfdlmp_onoff=$NTRACER
+<   archive_step =-1
+<   chem_hist_outname = "chem_out_"
+<   emi_inname  = "${EMIDIR}${CASE}/$SMONTH"
+<   dust_inname = "${EMIDIR}${CASE}/fengsha/$SMONTH"
+<   fireemi_inname  = "$ROTDIR/${prefix}.$PDY/$cyc/fireemi"
+<   emi_outname = "./"
+<   $chem_nml
+< /
+< 
+1012a1168,1169
+>   skeb_npass = ${SKEB_nPASS:-"30"}
+>   skeb_vdof = ${SKEB_VDOF:-"5"}
+1073,1075c1230,1232
+<     logo=$memdir/${CDUMP}.t${cyc}z.logf${FH3}.txt
+<     eval $NLN $atmo.ges $atmi
+<     eval $NLN $sfco.ges $sfci
+---
+>     logo=$memdir/${CDUMP}.t${cyc}z.logf${FH3}.$affix
+>     eval $NLN $atmo $atmi
+>     eval $NLN $sfco $sfci
+1085,1089c1242,1246
+<     eval $NLN $memdir/nggps2d.tile${n}.nc       nggps2d.tile${n}.nc       
+<     eval $NLN $memdir/nggps3d.tile${n}.nc       nggps3d.tile${n}.nc       
+<     eval $NLN $memdir/grid_spec.tile${n}.nc     grid_spec.tile${n}.nc     
+<     eval $NLN $memdir/atmos_static.tile${n}.nc  atmos_static.tile${n}.nc  
+<     eval $NLN $memdir/atmos_4xdaily.tile${n}.nc atmos_4xdaily.tile${n}.nc 
+---
+>     eval $NLN nggps2d.tile${n}.nc       $memdir/nggps2d.tile${n}.nc
+>     eval $NLN nggps3d.tile${n}.nc       $memdir/nggps3d.tile${n}.nc
+>     eval $NLN grid_spec.tile${n}.nc     $memdir/grid_spec.tile${n}.nc
+>     eval $NLN atmos_static.tile${n}.nc  $memdir/atmos_static.tile${n}.nc
+>     eval $NLN atmos_4xdaily.tile${n}.nc $memdir/atmos_4xdaily.tile${n}.nc
+1101,1103c1258
+< export MKL_NUM_THREADS=0
+< 
+< $APRUN_FV3 /bin/env KMP_AFFINITY=scatter KMP_NUM_THREADS=1 $DATA/$FCSTEXEC 1>&1 2>&2
+---
+> $APRUN_FV3 $DATA/$FCSTEXEC 1>&1 2>&2
+1109a1265,1297
+>   # Copy model restart files
+>   cd $RSTDIR_TMP
+>   #mkdir -p $memdir/RESTART
+> 
+>   # Only save restarts at single time in RESTART directory
+>   # Either at restart_interval or at end of the forecast
+>   if [ $restart_interval -eq 0 -o $restart_interval -eq $FHMAX ]; then
+> 
+>     # Add time-stamp to restart files at FHMAX
+>     RDATE=$($NDATE +$FHMAX $CDATE)
+>     rPDY=$(echo $RDATE | cut -c1-8)
+>     rcyc=$(echo $RDATE | cut -c9-10)
+>     for file in $(ls * | grep -v 0000); do
+>       $NMV $file ${rPDY}.${rcyc}0000.$file
+>       #$NCP ${rPDY}.${rcyc}0000.$file $memdir/RESTART/${rPDY}.${rcyc}0000.$file #lzhang
+>     done
+>     cd $memdir/
+>     $NLN RERUN_RESTART  RESTART 
+>   #  $NLN $memdir/RESTART  $RSTDIR_TMP
+>    
+> 
+>   else
+> 
+>     # time-stamp exists at restart_interval time, just copy
+>     RDATE=$($NDATE +$restart_interval $CDATE)
+>     rPDY=$(echo $RDATE | cut -c1-8)
+>     rcyc=$(echo $RDATE | cut -c9-10)
+>     for file in ${rPDY}.${rcyc}0000.* ; do
+>       $NCP $file $memdir/RESTART/$file
+>     done
+>   fi
+> 
+> 
+1116,1144c1304,1308
+<     if [ $FGAT3D = "TRUE" -a ${FGAT3D_onlyCenter} != "TRUE" ]; then
+<     #RDATE=$($NDATE +$restart_interval $CDATE)
+<     RDATE=$($NDATE +$assim_freq $CDATE)
+<     RDATEM3=$($NDATE -$assim_freq_half $RDATE)
+<     RDATEP3=$($NDATE $assim_freq_half $RDATE)
+<     RDATETMP=${RDATEM3}
+<     while [ $RDATETMP -le $RDATEP3 ]; do
+<         rPDY=$(echo $RDATETMP | cut -c1-8)
+<         rcyc=$(echo $RDATETMP | cut -c9-10)
+< 	if [ ${RDATETMP} = ${RDATE} ]; then
+<             #$NMV ${rPDY}.${rcyc}0000.* $memdir/RESTART/
+<             for file in ${rPDY}.${rcyc}0000.* ; do
+<                 $NMV $file $memdir/RESTART/$file.ges
+<             done
+< 	else
+<             #$NMV ${rPDY}.${rcyc}0000.fv_core.* $memdir/RESTART/
+<             #$NMV ${rPDY}.${rcyc}0000.fv_tracer.* $memdir/RESTART/
+<             #$NMV ${rPDY}.${rcyc}0000.coupler.res $memdir/RESTART/
+<             for file in ${rPDY}.${rcyc}0000.fv_core.* ; do
+<                 $NMV $file $memdir/RESTART/$file.ges
+<             done
+<             for file in ${rPDY}.${rcyc}0000.fv_tracer.* ; do
+<                 $NMV $file $memdir/RESTART/$file.ges
+<             done
+<             for file in ${rPDY}.${rcyc}0000.coupler.res ; do
+<                 $NMV $file $memdir/RESTART/$file.ges
+<             done
+< 	fi
+< 	RDATETMP=$($NDATE +$restart_interval $RDATETMP)
+---
+>     RDATE=$($NDATE +$restart_interval $CDATE)
+>     rPDY=$(echo $RDATE | cut -c1-8)
+>     rcyc=$(echo $RDATE | cut -c9-10)
+>     for file in ${rPDY}.${rcyc}0000.* ; do
+>       $NCP $file $memdir/RESTART/$file
+1146,1152c1310,1317
+<     else
+< 	RDATE=$($NDATE +$restart_interval $CDATE)
+< 	rPDY=$(echo $RDATE | cut -c1-8)
+< 	rcyc=$(echo $RDATE | cut -c9-10)
+< 	for file in ${rPDY}.${rcyc}0000.* ; do
+< 	    $NMV $file $memdir/RESTART/$file.ges
+< 	done
+---
+>     if [ $DOIAU = "YES" ] || [ $DOIAU_coldstart = "YES" ]; then
+>        # if IAU is on, save two consective restarts
+>        RDATE=$($NDATE +$restart_interval $RDATE)
+>        rPDY=$(echo $RDATE | cut -c1-8)
+>        rcyc=$(echo $RDATE | cut -c9-10)
+>        for file in ${rPDY}.${rcyc}0000.* ; do
+>           $NCP $file $memdir/RESTART/$file
+>        done
+1154,1155d1318
+< 	
+< 
+1160,1172d1322
+< # Determine if this is a warm start or cold start
+< if [ $gesln_clean = "YES" ]; then
+<    if [ $tracer_da2fcst = "NO" ]; then
+<       ${NRM} $gmemdir/RESTART/${PDY}.${cyc}0000.fv_tracer.res.tile?.nc
+<    fi
+<    ${NRM} $gmemdir/RESTART/${PDY}.${cyc}0000.coupler.res 
+<    ${NRM} $gmemdir/RESTART/${PDY}.${cyc}0000.fv_core.res.nc 
+<    ${NRM} $gmemdir/RESTART/${PDY}.${cyc}0000.fv_core.res.tile?.nc
+<    ${NRM} $gmemdir/RESTART/${PDY}.${cyc}0000.phy_data.tile?.nc
+<    ${NRM} $gmemdir/RESTART/${PDY}.${cyc}0000.sfc_data.tile?.nc
+<    ${NRM} $gmemdir/RESTART/${PDY}.${cyc}0000.fv_srf_wnd.res.tile?.nc
+< fi
+< 
+1175c1325
+< if [ $mkdata = "YES" ]; then rm -rf $DATA; fi
+---
+> #if [ $mkdata = "YES" ]; then rm -rf $DATA; fi
+1182c1332
+< exit ${err}
+---
+> exit 0

@@ -1,0 +1,28 @@
+#%Module1.0#####################################################################
+##
+## use.own modulefile
+##
+proc ModulesHelp { } {
+    puts stderr "\tThis module file adds the jedi stack for gnu/9.2.0 / openmpi/3.1.4"
+    puts stderr "\tto your module load path"
+}
+
+module-whatis   "adds the JEDI stack gnu 9.2.0 openmpi 3.1.4 directory to MODULEPATH"
+
+module load gnu/9.2.0
+module load openmpi/3.1.4
+module load szip/2.1
+module load hdf5/1.10.5
+
+# sysadmins built netcdf parallel, but without the bindings to Fortran. Sigh.
+# It's added to this stack build, unlike with the Intel compilers.
+
+set modbasedir /scratch1/NCEPDEV/jcsda/Ryan.Honeyager/jedi/usr/local/gnu-9.2.0/openmpi-3.1.4
+prepend-path PATH $modbasedir/bin
+setenv CC gcc
+setenv CXX g++
+setenv FC gfortran
+
+setenv NETCDF_ROOT $modbasedir
+setenv BOOST_ROOT $modbasedir
+

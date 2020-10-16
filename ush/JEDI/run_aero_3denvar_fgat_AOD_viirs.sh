@@ -14,6 +14,7 @@ bumptime=${validtime}
 #bumptime=
 prevtime=$($NDATE -$assim_freq $CDATE)
 startwin=$($NDATE -3 $CDATE)
+endwin=$($NDATE 3 $CDATE)
 res1=${CASE:-"C384"} # no lower case
 res=`echo "$res1" | tr '[:upper:]' '[:lower:]'`
 resc=$(echo $res1 |cut -c2-5)
@@ -69,12 +70,45 @@ obsstr=${validtime}
 obsin_viirs=./input/aod_viirs_obs_${obsstr}.nc4
 obsout_viirs=aod_viirs_hofx_3dvar_${obsstr}.nc4
 
+# set date format
+byy=$(echo $bumptime | cut -c1-4)
+bmm=$(echo $bumptime | cut -c5-6)
+bdd=$(echo $bumptime | cut -c7-8)
+bhh=$(echo $bumptime | cut -c9-10)
+locdatestr=${byy}-${bmm}-${bdd}T${bhh}:00:00Z
+
+vyy=$(echo $validtime | cut -c1-4)
+vmm=$(echo $validtime | cut -c5-6)
+vdd=$(echo $validtime | cut -c7-8)
+vhh=$(echo $validtime | cut -c9-10)
+vdatestr=${vyy}-${vmm}-${vdd}T${vhh}:00:00Z
+vdate_prefix=${vyy}${vmm}${vdd}.${vhh}0000
+
+pyy=$(echo $prevtime | cut -c1-4)
+pmm=$(echo $prevtime | cut -c5-6)
+pdd=$(echo $prevtime | cut -c7-8)
+phh=$(echo $prevtime | cut -c9-10)
+prevtimestr=${pyy}-${pmm}-${pdd}T${phh}:00:00Z
+
+syy=$(echo $startwin | cut -c1-4)
+smm=$(echo $startwin | cut -c5-6)
+sdd=$(echo $startwin | cut -c7-8)
+shh=$(echo $startwin | cut -c9-10)
+startwindow=${syy}-${smm}-${sdd}T${shh}:00:00Z
+
+eyy=$(echo $endwin | cut -c1-4)
+emm=$(echo $endwin | cut -c5-6)
+edd=$(echo $endwin | cut -c7-8)
+ehh=$(echo $endwin | cut -c9-10)
+endwindow=${eyy}-${emm}-${edd}T${ehh}:00:00Z
+
 # generate memstrs based on number of members
 imem=1
 rm -rf ${WorkDir}/memtmp.info
 filetype="      - filetype: gfs"
-filetrcr="        filename_trcr: fv_tracer.res.nc"
-filecplr="        filename_cplr: coupler.res"
+filetrcr="        filename_trcr: ${vdate_prefix}.fv_tracer.res.nc"
+filecore="        filename_core: ${vdate_prefix}.fv_core.res.nc"
+filecplr="        filename_cplr: ${vdate_prefix}.coupler.res"
 filevars1="        state variables: &aerovars [sulf,bc1,bc2,oc1,oc2,
                                     dust1,dust2,dust3,dust4,dust5,
                                     seas1,seas2,seas3,seas4]"
@@ -91,37 +125,13 @@ while [ ${imem} -le ${nmem} ]; do
    fi
 
    echo "${filemem}" >> ${WorkDir}/memtmp.info
+   echo "${filecore}" >> ${WorkDir}/memtmp.info
    echo "${filetrcr}" >> ${WorkDir}/memtmp.info
    echo "${filecplr}" >> ${WorkDir}/memtmp.info
    imem=$((imem+1))
 done
 
 members=`cat ${WorkDir}/memtmp.info`
-
-# set date format
-byy=$(echo $bumptime | cut -c1-4)
-bmm=$(echo $bumptime | cut -c5-6)
-bdd=$(echo $bumptime | cut -c7-8)
-bhh=$(echo $bumptime | cut -c9-10)
-locdatestr=${byy}-${bmm}-${bdd}T${bhh}:00:00Z
-
-vyy=$(echo $validtime | cut -c1-4)
-vmm=$(echo $validtime | cut -c5-6)
-vdd=$(echo $validtime | cut -c7-8)
-vhh=$(echo $validtime | cut -c9-10)
-datestr=${vyy}-${vmm}-${vdd}T${vhh}:00:00Z
-
-pyy=$(echo $prevtime | cut -c1-4)
-pmm=$(echo $prevtime | cut -c5-6)
-pdd=$(echo $prevtime | cut -c7-8)
-phh=$(echo $prevtime | cut -c9-10)
-prevtimestr=${pyy}-${pmm}-${pdd}T${phh}:00:00Z
-
-syy=$(echo $startwin | cut -c1-4)
-smm=$(echo $startwin | cut -c5-6)
-sdd=$(echo $startwin | cut -c7-8)
-shh=$(echo $startwin | cut -c9-10)
-startwindow=${syy}-${smm}-${sdd}T${shh}:00:00Z
 
 
 # create yaml file
@@ -130,9 +140,9 @@ cost function:
   background:
     filetype: gfs
     datapath: ./input/ensmean/
-    filename_core: fv_core.res.nc
-    filename_trcr: fv_tracer.res.nc
-    filename_cplr: coupler.res
+    filename_core: ${vdate_prefix}.fv_core.res.nc
+    filename_trcr: ${vdate_prefix}.fv_tracer.res.nc
+    filename_cplr: ${vdate_prefix}.coupler.res
     state variables: [T,DELP,sphum,
                       sulf,bc1,bc2,oc1,oc2,
                       dust1,dust2,dust3,dust4,dust5,
@@ -142,14 +152,14 @@ cost function:
     static weight: 0.01
     ensemble weight: 0.99
     static:
-      date: '${datestr}'
+      date: '${vdatestr}'
       covariance model: FV3JEDIstatic
     ensemble:
-      date: '${datestr}'
+      date: '${vdatestr}'
       members:
 ${members}
       localization:
-        timeslots: ['${locdatestr}']
+        timeslots: ['${vdatestr}']
         localization variables: *aerovars
         localization method: BUMP
         bump:
@@ -178,24 +188,24 @@ ${members}
         AerosolOption: aerosols_gocart_default
     obs error:
       covariance model: diagonal
-  cost type: 3D-Var
+  cost type: 4D-Var
   analysis variables: *aerovars 
-  window begin: '${startwindow}'
-  window length: PT6H
+  window begin: '${vdatestr}'
+  window length: PT3H
   variable change: Analysis2Model
   filetype: gfs
   datapath: ./input/ensmean/
-  filename_core: fv_core.res.nc
-  filename_trcr: fv_tracer.res.nc
-  filename_cplr: coupler.res
+  filename_core: ${bkgdatestr}.fv_core.res.nc
+  filename_trcr: ${bkgdatestr}.fv_tracer.res.nc
+  filename_cplr: ${bkgdatestr}.coupler.res
   model:
     name: PSEUDO
     pseudo_type: gfs
     datapath: ./input/ensmean/
-    filename_core: fv_core.res.nc
-    filename_trcr: fv_tracer.res.nc
-    filename_cplr: coupler.res
-    tstep: PT3H
+    filename_core: %yyyy%mm%dd.%hh%MM%ss.fv_core.res.nc
+    filename_trcr: %yyyy%mm%dd.%hh%MM%ss.fv_tracer.res.nc
+    filename_cplr: %yyyy%mm%dd.%hh%MM%ss.coupler.res
+    tstep: PT1H
     model variables: [T,DELP,sphum,
                       sulf,bc1,bc2,oc1,oc2,
                       dust1,dust2,dust3,dust4,dust5,
@@ -250,7 +260,7 @@ variational:
     linear model:
       variable change: Identity
       name: FV3JEDIIdTLM
-      tstep: PT3H
+      tstep: PT1H
       tlm variables: *aerovars
 EOF
 
@@ -291,7 +301,7 @@ while [ ${iproc} -le 5 ]; do
    #hofxout_aqua=${analroot}/aod_nnr_aqua_hofx_3dvar_${obsstr}_${procstr}.nc4
    #hofx_aqua=${WorkDir}/aod_nnr_aqua_hofx_3dvar_${obsstr}_${procstr}.nc4
    #${nln} ${hofxout_aqua} ${hofx_aqua}
-   
+
    hofxout_viirs=${analroot}/aod_viirs_hofx_3dvar_${obsstr}_${procstr}.nc4
    hofx_viirs=${WorkDir}/aod_viirs_3dvar_${obsstr}_${procstr}.nc4
    ${nln} ${hofxout_viirs} ${hofx_viirs}
@@ -300,47 +310,63 @@ while [ ${iproc} -le 5 ]; do
 done
 
 # link deterministic or mean background
-nowfilestr=${vyy}${vmm}${vdd}.${vhh}0000
 gesroot=${RotDir}/gdas.${pyy}${pmm}${pdd}/${phh}/
-mkdir -p ${inputdirout}/ensmean
-couplerin=${gesroot}/RESTART/${nowfilestr}.coupler.res.ges
-couplerges=${gesroot}/RESTART/${nowfilestr}.coupler.res.ges
-couplerout=${inputdirout}/ensmean/coupler.res
-#${nmv} ${couplerin} ${couplerges}
-${nln} ${couplerges} ${couplerout}
+if [ ${FGAT3D_3DENVAR} == "TRUE" -a ${FGAT3D_3DENVAR_onlyCenter} != "TRUE" ]; then
+   bkgtimest=${validtime}
+   bkgtimeed=${endwin}
+else
+   bkgtimest=${validtime}
+   bkgtimeed=${validtime}
+fi
+bkgfreq=${FGAT3D_3DENVAR_freq}
+while [ ${bkgtimest} -le ${bkgtimeed} ]; do
+    bkgyy=$(echo $bkgtimest | cut -c1-4)
+    bkgmm=$(echo $bkgtimest | cut -c5-6)
+    bkgdd=$(echo $bkgtimest | cut -c7-8)
+    bkghh=$(echo $bkgtimest | cut -c9-10)
+    bkgdatestr=${bkgyy}${bkgmm}${bkgdd}.${bkghh}0000
 
-itile=1
-while [ ${itile} -le 6 ]; do
-   tilestr=`printf %1i $itile`
+    mkdir -p ${inputdirout}/ensmean
+    couplerin=${gesroot}/RESTART/${bkgdatestr}.coupler.res.ges
+    couplerges=${gesroot}/RESTART/${bkgdatestr}.coupler.res.ges
+    couplerout=${inputdirout}/ensmean/${bkgdatestr}.coupler.res
+    #${nmv} ${couplerin} ${couplerges}
+    ${nln} ${couplerges} ${couplerout}
 
-   tilefile=fv_tracer.res.tile${tilestr}.nc
-   tilefilein=${gesroot}/RESTART/${nowfilestr}.${tilefile}.ges
-   tilefileges=${gesroot}/RESTART/${nowfilestr}.${tilefile}.ges
-   tilefileout=${inputdirout}/ensmean/${tilefile}
-   #${ncp} ${tilefilein} ${tilefileges}
-   ${nln} ${tilefileges} ${tilefileout}
+    itile=1
+    while [ ${itile} -le 6 ]; do
+       tilestr=`printf %1i $itile`
+
+       tilefile=${bkgdatestr}.fv_tracer.res.tile${tilestr}.nc
+       tilefilein=${gesroot}/RESTART/${tilefile}.ges
+       tilefileges=${gesroot}/RESTART/${tilefile}.ges
+       tilefileout=${inputdirout}/ensmean/${tilefile}
+       #${ncp} ${tilefilein} ${tilefileges}
+       ${nln} ${tilefileges} ${tilefileout}
 
 
-   tilefile=fv_core.res.tile${tilestr}.nc
-   tilefilein=${gesroot}/RESTART/${nowfilestr}.${tilefile}.ges
-   tilefileges=${gesroot}/RESTART/${nowfilestr}.${tilefile}.ges
-   tilefileout=${inputdirout}/ensmean/${tilefile}
-   #${ncp} ${tilefilein} ${tilefileges}
-   ${nln} ${tilefileges} ${tilefileout}
+       tilefile=${bkgdatestr}.fv_core.res.tile${tilestr}.nc
+       tilefilein=${gesroot}/RESTART/${tilefile}.ges
+       tilefileges=${gesroot}/RESTART/${tilefile}.ges
+       tilefileout=${inputdirout}/ensmean/${tilefile}
+       #${ncp} ${tilefilein} ${tilefileges}
+       ${nln} ${tilefileges} ${tilefileout}
 
-   itile=$((itile+1))
+       itile=$((itile+1))
+    done
+    bkgtimest=$($NDATE ${bkgfreq} $bkgtimest)
 done
 
 # link ensemble member backgrounds
 ensgesroot=${RotDir}/enkfgdas.${pyy}${pmm}${pdd}/${phh}/
-
+bkgdatestr=${vdate_prefix}
 imem=1
 while [ ${imem} -le ${nmem} ]; do
     memstr="mem"`printf %03d $imem`
     mkdir -p ${inputdirout}/${memstr}
-    couplerin=${ensgesroot}/${memstr}/RESTART/${nowfilestr}.coupler.res.ges
-    couplerges=${ensgesroot}/${memstr}/RESTART/${nowfilestr}.coupler.res.ges
-    couplerout=${inputdirout}/${memstr}/coupler.res
+    couplerin=${ensgesroot}/${memstr}/RESTART/${bkgdatestr}.coupler.res.ges
+    couplerges=${ensgesroot}/${memstr}/RESTART/${bkgdatestr}.coupler.res.ges
+    couplerout=${inputdirout}/${memstr}/${bkgdatestr}.coupler.res
     #${ncp} ${couplerin} ${couplerges}
     ${nln} ${couplerin} ${couplerout}
 
@@ -348,16 +374,16 @@ while [ ${imem} -le ${nmem} ]; do
     while [ ${itile} -le 6 ]; do
        tilestr=`printf %1i $itile`
     
-       tilefile=fv_tracer.res.tile${tilestr}.nc
-       tilefilein=${ensgesroot}/${memstr}/RESTART/${nowfilestr}.${tilefile}.ges
-       tilefileges=${ensgesroot}/${memstr}/RESTART/${nowfilestr}.${tilefile}.ges
+       tilefile=${bkgdatestr}.fv_tracer.res.tile${tilestr}.nc
+       tilefilein=${ensgesroot}/${memstr}/RESTART/${tilefile}.ges
+       tilefileges=${ensgesroot}/${memstr}/RESTART/${tilefile}.ges
        tilefileout=${inputdirout}/${memstr}/${tilefile}
        #${ncp} ${tilefilein} ${tilefileges}
        ${nln} ${tilefileges} ${tilefileout}
     
-       tilefile=fv_core.res.tile${tilestr}.nc
-       tilefilein=${ensgesroot}/${memstr}/RESTART/${nowfilestr}.${tilefile}.ges
-       tilefileges=${ensgesroot}/${memstr}/RESTART/${nowfilestr}.${tilefile}.ges
+       tilefile=${bkgdatestr}.fv_core.res.tile${tilestr}.nc
+       tilefilein=${ensgesroot}/${memstr}/RESTART/${tilefile}.ges
+       tilefileges=${ensgesroot}/${memstr}/RESTART/${tilefile}.ges
        tilefileout=${inputdirout}/${memstr}/${tilefile}
        #${ncp} ${tilefilein} ${tilefileges}
        ${nln} ${tilefileges} ${tilefileout}
@@ -370,8 +396,8 @@ done
 # link deterministic or mean analysis
 analysisdir=${WorkDir}/analysis
 mkdir -p ${analysisdir}
-coupleranl=${gesroot}/RESTART/${nowfilestr}.coupler.res
-couplerwork=${analysisdir}/${nowfilestr}.hyb-3dvar-gfs_aero.coupler.res
+coupleranl=${gesroot}/RESTART/${vdate_prefix}.coupler.res
+couplerwork=${analysisdir}/${vdate_prefix}.hyb-3dvar-gfs_aero.coupler.res
 ${nln} ${coupleranl} ${couplerwork}
 
 itile=1
@@ -379,13 +405,13 @@ while [ ${itile} -le 6 ]; do
    tilestr=`printf %1i $itile`
 
    tilefile=fv_tracer.res.tile${tilestr}.nc
-   tilefileanl=${gesroot}/RESTART/${nowfilestr}.${tilefile}
-   tilefilework=${analysisdir}/${nowfilestr}.hyb-3dvar-gfs_aero.${tilefile}
+   tilefileanl=${gesroot}/RESTART/${vdate_prefix}.${tilefile}
+   tilefilework=${analysisdir}/${vdate_prefix}.hyb-3dvar-gfs_aero.${tilefile}
    ${nln} ${tilefileanl} ${tilefilework}
 
    tilefile=fv_core.res.tile${tilestr}.nc
-   tilefileanl=${gesroot}/RESTART/${nowfilestr}.${tilefile}
-   tilefilework=${analysisdir}/${nowfilestr}.hyb-3dvar-gfs_aero.${tilefile}
+   tilefileanl=${gesroot}/RESTART/${vdate_prefix}.${tilefile}
+   tilefilework=${analysisdir}/${vdate_prefix}.hyb-3dvar-gfs_aero.${tilefile}
    ${nln} ${tilefileanl} ${tilefilework}
 
    itile=$((itile+1))

@@ -62,12 +62,10 @@ yamlfile=${WorkDir}/hyb-3dvar_gfs_aero.yaml
 #bumpstring=
 obsstr=${validtime}
 #startwinstr
-#obsin_terra=./input/aod_nnr_terra_obs_${obsstr}.nc4
-#obsout_terra=aod_nnr_terra_hofx_3dvar_${obsstr}.nc4
-#obsin_aqua=./input/aod_nnr_aqua_obs_${obsstr}.nc4
-#obsout_aqua=aod_nnr_aqua_hofx_3dvar_${obsstr}.nc4
-obsin_viirs=./input/aod_viirs_obs_${obsstr}.nc4
-obsout_viirs=aod_viirs_hofx_3dvar_${obsstr}.nc4
+obsin_terra=./input/aod_nnr_terra_obs_${obsstr}.nc4
+obsout_terra=aod_nnr_terra_hofx_3dvar_${obsstr}.nc4
+obsin_aqua=./input/aod_nnr_aqua_obs_${obsstr}.nc4
+obsout_aqua=aod_nnr_aqua_hofx_3dvar_${obsstr}.nc4
 
 # generate memstrs based on number of members
 imem=1
@@ -153,7 +151,7 @@ ${members}
         localization variables: *aerovars
         localization method: BUMP
         bump:
-          prefix: ./bump/fv3jedi_bumpparameters_loc_gfs_aero 
+          prefix: ./bump/fv3jedi_bumpparameters_loc_gfs_aero_rv0.86
           method: loc
           strategy: common
           load_nicas: 1
@@ -163,16 +161,34 @@ ${members}
   - obs space:
       name: Aod
       obsdatain:
-        obsfile: ${obsin_viirs}
+        obsfile: ${obsin_terra}
       obsdataout:
-        obsfile: ${obsout_viirs}
+        obsfile: ${obsout_terra}
       simulated variables: [aerosol_optical_depth]
       channels: 4
     obs operator:
       name: Aod
       Absorbers: [H2O,O3]
       obs options:
-        Sensor_ID: v.viirs-m_npp
+        Sensor_ID: v.modis_terra
+        EndianType: little_endian
+        CoefficientPath: ./crtm/
+        AerosolOption: aerosols_gocart_default
+    obs error:
+      covariance model: diagonal
+  - obs space:
+      name: Aod
+      obsdatain:
+        obsfile: ${obsin_aqua}
+      obsdataout:
+        obsfile: ${obsout_aqua}
+      simulated variables: [aerosol_optical_depth]
+      channels: 4
+    obs operator:
+      name: Aod
+      Absorbers: [H2O,O3]
+      obs options:
+        Sensor_ID: v.modis_aqua
         EndianType: little_endian
         CoefficientPath: ./crtm/
         AerosolOption: aerosols_gocart_default
@@ -266,17 +282,15 @@ ${nln} ${FV3Dir}/akbk64.nc4 ${inputdirout}/akbk.nc
 
 # link bump directory
 mkdir -p ${WorkDir}/bump
-${nln} ${BumpDir}/fv3jedi_bumpparameters_loc_gfs_aero*  ${WorkDir}/bump/ 
+${nln} ${BumpDir}/fv3jedi_bumpparameters_loc_gfs_aero_rv0.86*  ${WorkDir}/bump/ 
 #${nln} ${BumpDir} ${WorkDir}/"bump"
 
 # link observations
 #obsfile=${ObsDir}"/viirs_aod_npp_"${obsstr}".nc"
-#obsfile_terra=${ObsDir}/nnr_terra.${obsstr}.nc
-#obsfile_aqua=${ObsDir}/nnr_aqua.${obsstr}.nc
-#${nln} ${obsfile_terra} ${obsin_terra}
-#${nln} ${obsfile_aqua} ${obsin_aqua}
-obsfile_viirs=${ObsDir}/viirs_aod_snpp.${obsstr}.nc
-${nln} ${obsfile_viirs} ${obsin_viirs}
+obsfile_terra=${ObsDir}/nnr_terra.${obsstr}.nc
+obsfile_aqua=${ObsDir}/nnr_aqua.${obsstr}.nc
+${nln} ${obsfile_terra} ${obsin_terra}
+${nln} ${obsfile_aqua} ${obsin_aqua}
 
 analroot=${RotDir}gdas.${vyy}${vmm}${vdd}/${vhh}/
 mkdir -p ${analroot}
@@ -284,17 +298,13 @@ mkdir -p ${analroot}
 iproc=0
 while [ ${iproc} -le 5 ]; do
    procstr=`printf %04d ${iproc}`
-   #hofxout_terra=${analroot}/aod_nnr_terra_hofx_3dvar_${obsstr}_${procstr}.nc4
-   #hofx_terra=${WorkDir}/aod_nnr_terra_hofx_3dvar_${obsstr}_${procstr}.nc4
-   #${nln} ${hofxout_terra} ${hofx_terra}
+   hofxout_terra=${analroot}/aod_nnr_terra_hofx_3dvar_${obsstr}_${procstr}.nc4
+   hofx_terra=${WorkDir}/aod_nnr_terra_hofx_3dvar_${obsstr}_${procstr}.nc4
+   ${nln} ${hofxout_terra} ${hofx_terra}
 
-   #hofxout_aqua=${analroot}/aod_nnr_aqua_hofx_3dvar_${obsstr}_${procstr}.nc4
-   #hofx_aqua=${WorkDir}/aod_nnr_aqua_hofx_3dvar_${obsstr}_${procstr}.nc4
-   #${nln} ${hofxout_aqua} ${hofx_aqua}
-   
-   hofxout_viirs=${analroot}/aod_viirs_hofx_3dvar_${obsstr}_${procstr}.nc4
-   hofx_viirs=${WorkDir}/aod_viirs_3dvar_${obsstr}_${procstr}.nc4
-   ${nln} ${hofxout_viirs} ${hofx_viirs}
+   hofxout_aqua=${analroot}/aod_nnr_aqua_hofx_3dvar_${obsstr}_${procstr}.nc4
+   hofx_aqua=${WorkDir}/aod_nnr_aqua_hofx_3dvar_${obsstr}_${procstr}.nc4
+   ${nln} ${hofxout_aqua} ${hofx_aqua}
 
    iproc=$((iproc+1))
 done
@@ -398,8 +408,8 @@ ${nln} ${jediexe} ${WorkDir}/fv3jedi_var.x
 # CRTM related things
 #CRTMFix=${JEDIDir}"/fv3-jedi/test/Data/crtm/"
 CRTMFix=${HOMEgfs}/fix/jedi_crtm_fix_20200413/CRTM_fix/Little_Endian/
-coeffs="AerosolCoeff.bin CloudCoeff.bin v.viirs-m_npp.SpcCoeff.bin v.viirs-m_npp.TauCoeff.bin"
-#coeffs="AerosolCoeff.bin CloudCoeff.bin v.modis_terra.SpcCoeff.bin v.modis_terra.TauCoeff.bin v.modis_aqua.SpcCoeff.bin v.modis_aqua.TauCoeff.bin"
+#coeffs="AerosolCoeff.bin CloudCoeff.bin v.viirs-m_npp.SpcCoeff.bin v.viirs-m_npp.TauCoeff.bin"
+coeffs="AerosolCoeff.bin CloudCoeff.bin v.modis_terra.SpcCoeff.bin v.modis_terra.TauCoeff.bin v.modis_aqua.SpcCoeff.bin v.modis_aqua.TauCoeff.bin"
 
 mkdir -p ${WorkDir}/crtm/
 
