@@ -1,0 +1,7 @@
+38,39d37
+< GSUFFIX=${GSUFFIX:-$SUFFIX}
+< 
+189c187
+<          $DBNROOT/bin/dbn_alert MODEL GFS_ENKF $job $COMOUT/$memchar/${CDUMP}.t${cyc}z.sfcf${FH3}.${GSUFFIX}
+---
+>          $DBNROOT/bin/dbn_alert MODEL GFS_ENKF $job $COMOUT/$memchar/${CDUMP}.t${cyc}z.sfcf${FH3}.nemsio

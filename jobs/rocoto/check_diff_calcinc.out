@@ -1,0 +1,75 @@
+34d33
+< export CALCINCNCEXEC=${CALCINCNCEXEC:-$HOMEgfs/exec/calc_increment_ens_ncio.x}
+42c41
+< TMPDAY=`$NDATE -$assim_freq $PDY$cyc`
+---
+> TMPDAY=`$NDATE -24 $PDY$cyc`
+44,48d42
+< HIScyc=`echo $TMPDAY | cut -c9-10`
+< export cycle="t${cyc}z"
+< 
+< fhr=${assim_freq}
+< typeset -Z3 fhr
+52,61c46,55
+<   mkdir -p $DATA
+<   cd $DATA
+<   mkdir -p calcinc.$$
+<   cd calcinc.$$
+< 
+<   if [ $SUFFIX = ".nc" ]; then
+<     $NCP $CALCINCNCEXEC ./calc_inc.x
+<   else
+<     $NCP $CALCINCEXEC ./calc_inc.x
+<   fi
+---
+> export DATA="$RUNDIR/$CDATE/$CDUMP"
+> 
+> [[ ! -d $DATA ]] && mkdir -p $DATA
+> 
+> cd $DATA
+> 
+> #ln -sf  /scratch1/BMC/gsd-fv3/NCEPDEV/stmp3/rtfim/RUNDIRS/rt_fv3gfs_chem/$CDATE/$CDUMP/regrid  regrid #lzhang
+> ln -sf $RUNDIR1/$CDATE/$CDUMP/regrid regrid #lzhang
+> mkdir -p calcinc
+> cd calcinc
+63c57
+<   # deterministic run first
+---
+> #     $NLN sigf06 atmges_mem001 ; $NLN siganl atmanl_mem001 ; 
+66,69c60,63
+<   mkdir -p $ROTDIR/$CDUMP.$PDY/$cyc/$mem/
+<   $NLN $ROTDIR/$CDUMP.$HISDAY/${HIScyc}/${CDUMP}.t${HIScyc}z.atmf${fhr}$SUFFIX.ges atmges_mem001
+<   $NLN $ICSDIR/${CASE}/$CDUMP.$PDY/$cyc/$mem/$CDUMP.$cycle.atmanl$SUFFIX atmanl_mem001
+<   $NLN $ROTDIR/$CDUMP.$PDY/$cyc/$mem/$CDUMP.$cycle.atminc.nc atminc_mem001
+---
+>   $NCP $CALCINCEXEC .
+>   $NLN $OUTDIR/$CDUMP.$HISDAY/00/$CDUMP.t00z.atmf024.nemsio atmges_mem001
+>   $NLN ../regrid/atmanl.$PDY$cyc atmanl_mem001
+>   $NLN atminc.nc atminc_mem001
+88,89c82,83
+<   $APRUN ./calc_inc.x
+<   ERR=$?
+---
+>   $APRUN $(basename $CALCINCEXEC)
+>   rc=$?
+91,96c85,87
+<   #export ERR=$rc
+<   #export err=$ERR
+<   #$ERRSCRIPT || exit 3
+<   unlink atmges_mem001
+<   unlink atmanl_mem001
+<   unlink atminc_mem001
+---
+>   export ERR=$rc
+>   export err=$ERR
+>   $ERRSCRIPT || exit 3
+98,104c89
+< 
+< set +x 
+< if [ $VERBOSE = "YES" ]; then
+<    echo $(date) EXITING $0 with return code $err >&2
+< fi
+< 
+< exit ${err}
+---
+>    

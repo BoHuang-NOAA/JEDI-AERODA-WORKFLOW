@@ -1,0 +1,53 @@
+4,13d3
+< ## Abstract:
+< ## Create biomass burning emissions for FV3-CHEM
+< ## RUN_ENVIR : runtime environment (emc | nco)
+< ## HOMEgfs   : /full/path/to/workflow
+< ## EXPDIR : /full/path/to/config/files
+< ## CDATE  : current date (YYYYMMDDHH)
+< ## CDUMP  : cycle name (gdas / gfs)
+< ## PDY    : current date (YYYYMMDD)
+< ## cyc    : current cycle (HH)
+< ###############################################################
+20,40d9
+< # Source relevant configs
+< configs="base anal"
+< for config in $configs; do
+<     . $EXPDIR/config.${config}
+<     status=$?
+<     [[ $status -ne 0 ]] && exit $status
+< done
+< ###############################################################
+< 
+< ##########################################
+< # Source machine runtime environment
+< ##########################################
+< . $HOMEgfs/env/${machine}.env anal 
+< status=$?
+< [[ $status -ne 0 ]] && exit $status
+< 
+< export DATA=${DATA:-${DATAROOT}/${jobid:?}}
+< 
+< mkdir -p $DATA
+< cd $DATA
+< ###############################################################
+42c11
+< $HOMEgfs/jobs/JJEDI_ANALYSIS
+---
+> $HOMEgfs/jobs/JGLOBAL_ANALYSIS
+44,56c13
+< [[ $status -ne 0 ]] && exit $status
+< 
+< ###############################################################
+< # Exit cleanly
+< ##########################################
+< # Remove the Temporary working directory
+< ##########################################
+< cd $DATAROOT
+< [[ $KEEPDATA = "NO" ]] && rm -rf $DATA
+< 
+< date
+< exit 0
+< 
+---
+> exit $status

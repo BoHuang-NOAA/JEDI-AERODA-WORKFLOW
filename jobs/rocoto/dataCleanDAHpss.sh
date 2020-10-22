@@ -33,7 +33,7 @@ mkdir -p ${hpssTmp}
 cat > ${hpssTmp}/job_hpss_${CDATE}.sh << EOF
 #!/bin/bash --login
 #SBATCH -J hpss-${CDATE}
-#SBATCH -A chem-var
+#SBATCH -A ${HPSS_ACCOUNT}
 #SBATCH -n 1
 #SBATCH -t 24:00:00
 #SBATCH -p service

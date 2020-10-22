@@ -1,0 +1,119 @@
+27a28
+> export DATA="$RUNDIR/$CDATE/$CDUMP"
+29,36c30,33
+< ##########################################
+< # Source machine runtime environment
+< ##########################################
+< . $HOMEgfs/env/${machine}.env prep 
+< status=$?
+< [[ $status -ne 0 ]] && exit $status
+< 
+< export DATA=${DATA:-${DATAROOT}/${jobid:?}}
+---
+> [[ ! -d $DATA ]] && mkdir -p $DATA
+> cd $DATA || exit 10
+> mkdir -p prep
+> cd prep
+38,39c35
+< mkdir -p $DATA
+< cd $DATA
+---
+> if [ $EMITYPE -eq 1 ]; then
+45,47c41
+< done
+< #$NCP /scratch2/BMC/neaqs/stu/fimchem/gcrt_bg2_hera/bin/prep_chem_sources_RADM_FV3_.exe .
+< $NCP ${HOMEgfs}/exec/prep_chem_sources_RADM_FV3_.exe ./
+---
+>     done
+51a46
+> fi
+60,67d54
+< #module list
+< #module purge
+< #module list
+< #module load intel/14.0.2
+< #module load szip/2.1
+< #module load hdf5/1.8.14
+< #module load netcdf/4.3.0
+< #module list
+70,72d56
+< module load intel/17.0.5.239
+< module load netcdf/4.6.1
+< module load hdf5/1.10.4
+74,75c58,63
+< #    ./prep_chem_sources || fail "ERROR: prep_chem_sources failed."
+<     ./prep_chem_sources_RADM_FV3_.exe || fail "ERROR: prep_chem_sources failed."
+---
+> module load intel/14.0.2
+> module load szip/2.1
+> module load hdf5/1.8.14
+> module load netcdf/4.3.0
+> module list
+>     ./prep_chem_sources || fail "ERROR: prep_chem_sources failed."
+82,87d69
+< 
+< # make output directories
+< mkdir -p $ROTDIR/${CDUMP}.$PDY/$cyc/fireemi
+< if [ $NMEM_AERO > 0 ]; then
+<   mkdir -p $ROTDIR/enkf${CDUMP}.$PDY/$cyc/fireemi
+< fi
+91,92c73,79
+< mkdir -p $tiledir
+< cd $tiledir
+---
+> #mkdir -p $tiledir
+> #cd $tiledir
+>     EMIINPUT=/scratch1/BMC/gsd-fv3-dev/Haiqin.Li/Develop/emi_${CASE}
+>     eval $NLN $EMIINPUT/EMI/$SMONTH/emi_data.tile${n}.nc .
+>     eval $NLN $EMIINPUT/EMI2/$SMONTH/emi2_data.tile${n}.nc .
+>     eval $NLN $EMIINPUT/fengsha/$SMONTH/dust_data.tile${n}.nc .
+> 
+93a81,82
+>     mkdir -p $tiledir
+>     cd $tiledir
+103,104c92,95
+<     DIRGB=${GBBDIR}
+<     PUBEMI=${PUBEMI:-/scratch1/BMC/gsd-fv3-dev/lzhang/GBBEPx}
+---
+>     DIRGB=/scratch1/BMC/gsd-fv3-dev/lzhang/GBBEPx
+>     NCGB=/scratch1/BMC/gsd-fv3-dev/Haiqin.Li/Develop/emi_${CASE}/GBBEPx
+>     PUBEMI=/scratch2/BMC/public/data/grids/sdsu/emissions
+>     #PUBEMI=/scratch2/NCEPDEV/stmp1/Li.Pan/tmp
+107,125c98,100
+<     if [ ! -s $DIRGB/Emission/$emiss_date1 ]; then
+<        mkdir -p $DIRGB/$emiss_date1
+<     fi
+<     $NCP $PUBEMI/${emiss_date1}/${emiss_date1}.*.bin $DIRGB/$emiss_date1/
+< #Mariusz's GBBEPX file format    
+< #    eval $NLN $DIRGB/${emiss_date1}/GBBEPx.bc.${emiss_date1}.FV3.${CASE}Grid.$tiledir.bin  ebu_bc.dat
+< #    eval $NLN $DIRGB/${emiss_date1}/GBBEPx.oc.${emiss_date1}.FV3.${CASE}Grid.$tiledir.bin  ebu_oc.dat
+< #    eval $NLN $DIRGB/${emiss_date1}/GBBEPx.so2.${emiss_date1}.FV3.${CASE}Grid.$tiledir.bin  ebu_so2.dat
+< #    eval $NLN $DIRGB/${emiss_date1}/GBBEPx.pm25.${emiss_date1}.FV3.${CASE}Grid.$tiledir.bin  ebu_pm_25.dat
+< #    #eval $NLN $DIRGB/${emiss_date1}/meanFRP.${emiss_date1}.FV3.${CASE}Grid.$tiledir.bin  plumefrp.dat
+< 
+< #Li's GBBEPX file format
+<     eval $NLN $DIRGB/${emiss_date1}/GBBEPx.emis_BC.003.${emiss_date1}.FV3.${CASE}Grid.$tiledir.bin  ebu_bc.dat
+<     eval $NLN $DIRGB/${emiss_date1}/GBBEPx.emis_OC.003.${emiss_date1}.FV3.${CASE}Grid.$tiledir.bin  ebu_oc.dat
+<     eval $NLN $DIRGB/${emiss_date1}/GBBEPx.emis_SO2.003.${emiss_date1}.FV3.${CASE}Grid.$tiledir.bin  ebu_so2.dat
+<     eval $NLN $DIRGB/${emiss_date1}/GBBEPx.emis_PM25.003.${emiss_date1}.FV3.${CASE}Grid.$tiledir.bin  ebu_pm_25.dat
+<     eval $NLN $DIRGB/${emiss_date1}/GBBEPx.FRP.003.${emiss_date1}.FV3.${CASE}Grid.$tiledir.bin  plumefrp.dat
+< 
+< cd ..
+---
+>     #mkdir -p $DIRGB/$emiss_date1
+>     #$NCP $PUBEMI/*${emiss_date1}.*.bin $DIRGB/$emiss_date1/
+>     eval $NLN $NCGB/${emiss_date1}/FIRE_GBBEPx_data.tile${n}.nc .
+172,175d146
+< mv $tiledir $ROTDIR/${CDUMP}.$PDY/$cyc/fireemi/.  
+< if [ $NMEM_AERO > 0 ]; then
+<   $NLN $ROTDIR/${CDUMP}.$PDY/$cyc/fireemi/$tiledir $ROTDIR/enkf${CDUMP}.$PDY/$cyc/fireemi/$tiledir
+< fi
+188,195d158
+< ##########################################
+< # Remove the Temporary working directory
+< ##########################################
+< cd $DATAROOT
+< [[ $KEEPDATA = "NO" ]] && rm -rf $DATA
+< 
+< date
+< exit 0

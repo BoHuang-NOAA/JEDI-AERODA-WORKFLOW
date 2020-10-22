@@ -1,0 +1,2 @@
+129d128
+< export COMOUT=${COMOUT:-$COMIN}

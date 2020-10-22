@@ -777,6 +777,7 @@
 	<envar><name>RUN_ENVIR</name><value>&RUN_ENVIR;</value></envar>
 	<envar><name>machine</name><value>&machine;</value></envar>
 	<envar><name>HPSS_PROJECT</name><value>&HPSS_PROJECT;</value></envar>
+	<envar><name>HPSS_ACCOUNT</name><value>&ACCOUNT;</value></envar>
 	<envar><name>PDY</name><value><cyclestr>@Y@m@d</cyclestr></value></envar>
 	<envar><name>cyc</name><value><cyclestr>@H</cyclestr></value></envar>
 	<dependency>

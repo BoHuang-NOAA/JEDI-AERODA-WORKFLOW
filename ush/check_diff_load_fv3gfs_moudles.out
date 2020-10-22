@@ -1,0 +1,4 @@
+21,23d20
+< elif [[ -d /scratch3 ]] ; then
+<     # We are on NOAA Theia
+< 	module load module_base.theia 
