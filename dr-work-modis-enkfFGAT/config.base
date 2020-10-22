@@ -327,7 +327,8 @@ if [ $DONST = "YES" ]; then export FNTSFA="        "; fi
 export nst_anl=.true.
 
 # Analysis increments to zero in CALCINCEXEC
-export INCREMENTS_TO_ZERO="'delp_inc','delz_inc','clwmr_inc','icmr_inc'"
+#export INCREMENTS_TO_ZERO="'delp_inc','delz_inc','clwmr_inc','icmr_inc'"
+export INCREMENTS_TO_ZERO="'delz_inc','clwmr_inc','icmr_inc'"
 export DO_CALC_INCREMENT="YES"
 export DO_CALC_ANALYSIS="NO"
 
