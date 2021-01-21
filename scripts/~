@@ -211,7 +211,7 @@ if [ -f $gmemdir/RESTART/${PDY}.${cyc}0000.coupler.res -o -f $gmemdir/RESTART/${
 	       tracer_da2fcst="NO"
 	       ${NLN} $gmemdir/RESTART/${PDY}.${cyc}0000.fv_tracer.res.tile${n}.nc.ges $gmemdir/RESTART/${PDY}.${cyc}0000.fv_tracer.res.tile${n}.nc
 	    else
-	       ${NMV} $gmemdir/RESTART/${PDY}.${cyc}0000.fv_core.res.tile${n}.nc $gmemdir/RESTART/${PDY}.${cyc}0000.fv_core.res.tile${n}.nc.aeroDAoutput
+	       #${NMV} $gmemdir/RESTART/${PDY}.${cyc}0000.fv_core.res.tile${n}.nc $gmemdir/RESTART/${PDY}.${cyc}0000.fv_core.res.tile${n}.nc.aeroDAoutput
 	    fi
 	    ${NLN} $gmemdir/RESTART/${PDY}.${cyc}0000.fv_core.res.tile${n}.nc.ges $gmemdir/RESTART/${PDY}.${cyc}0000.fv_core.res.tile${n}.nc
 	    ${NLN} $gmemdir/RESTART/${PDY}.${cyc}0000.phy_data.tile${n}.nc.ges $gmemdir/RESTART/${PDY}.${cyc}0000.phy_data.tile${n}.nc
@@ -970,7 +970,7 @@ deflate_level=${deflate_level:-1}
   kemit=1
   phot_opt=1
   photdt=60
-  plumerisefire_frq=-60
+  plumerisefire_frq=60
   PLUMERISE_flag=$EMITYPE
   seas_opt=2
   seas_emis_scheme=-1
@@ -1112,9 +1112,7 @@ if [ $SEND = "YES" ]; then
   if [ $CDUMP = "gdas" -a $restart_interval -gt 0 ]; then
     cd $DATA/RESTART
     mkdir -p $memdir/RESTART
-    #$NMV * $memdir/RESTART/
-    
-    if [ "YES" = "YES" ]; then
+
     if [ $FGAT3D = "TRUE" -a ${FGAT3D_onlyCenter} != "TRUE" ]; then
     #RDATE=$($NDATE +$restart_interval $CDATE)
     RDATE=$($NDATE +$assim_freq $CDATE)
@@ -1152,7 +1150,6 @@ if [ $SEND = "YES" ]; then
 	for file in ${rPDY}.${rcyc}0000.* ; do
 	    $NMV $file $memdir/RESTART/$file.ges
 	done
-    fi
     fi
 	
 

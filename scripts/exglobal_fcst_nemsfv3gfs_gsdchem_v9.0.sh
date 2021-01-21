@@ -210,8 +210,8 @@ if [ -f $gmemdir/RESTART/${PDY}.${cyc}0000.coupler.res -o -f $gmemdir/RESTART/${
 	    if [ ! -f $gmemdir/RESTART/${PDY}.${cyc}0000.fv_tracer.res.tile${n}.nc ]; then
 	       tracer_da2fcst="NO"
 	       ${NLN} $gmemdir/RESTART/${PDY}.${cyc}0000.fv_tracer.res.tile${n}.nc.ges $gmemdir/RESTART/${PDY}.${cyc}0000.fv_tracer.res.tile${n}.nc
-	    else
-	       ${NMV} $gmemdir/RESTART/${PDY}.${cyc}0000.fv_core.res.tile${n}.nc $gmemdir/RESTART/${PDY}.${cyc}0000.fv_core.res.tile${n}.nc.aeroDAoutput
+	    #else
+	       #${NMV} $gmemdir/RESTART/${PDY}.${cyc}0000.fv_core.res.tile${n}.nc $gmemdir/RESTART/${PDY}.${cyc}0000.fv_core.res.tile${n}.nc.aeroDAoutput
 	    fi
 	    ${NLN} $gmemdir/RESTART/${PDY}.${cyc}0000.fv_core.res.tile${n}.nc.ges $gmemdir/RESTART/${PDY}.${cyc}0000.fv_core.res.tile${n}.nc
 	    ${NLN} $gmemdir/RESTART/${PDY}.${cyc}0000.phy_data.tile${n}.nc.ges $gmemdir/RESTART/${PDY}.${cyc}0000.phy_data.tile${n}.nc

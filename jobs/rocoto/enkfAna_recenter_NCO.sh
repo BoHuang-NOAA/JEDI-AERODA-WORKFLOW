@@ -37,8 +37,6 @@ pwd=$(pwd)
 export NWPROD=${NWPROD:-$pwd}
 export HOMEgfs=${HOMEgfs:-$NWPROD}
 export JEDIUSH=${JEDIUSH:-$HOMEgfs/ush/JEDI/}
-export DATA=${DATA:-${DATAROOT}/enkfrecenter.$$}
-export RECENTEREXEC=${RECENTEREXEC:-$HOMEgfs/exec/recenter_aeros.x}
 
 # Base variables
 CDATE=${CDATE:-"2001010100"}
@@ -74,6 +72,10 @@ export DATA=${DATA}/grp${ENSGRP}
 
 mkdir -p $DATA && cd $DATA/
 
+#vars_recenter=bc1,bc2,oc1,oc2,dust1,dust2,dust3,dust4,dust5,seas1,seas2,seas3,seas4,seas5,sulf,dms,msa,pp10,pp25,so2
+vars_recenter=bc1,bc2,oc1,oc2,dust1,dust2,dust3,dust4,dust5,seas1,seas2,seas3,seas4,seas5,sulf
+vars_append=cld_amt,graupel,ice_wat,liq_wat,o3mr,rainwat,snowwat,sphum,so2,dms,msa,pp25,pp10
+
 ###############################################################
 # need to loop through ensemble members if necessary
 if [ $ENKF_RECENTER == "TRUE" ]; then
@@ -90,34 +92,17 @@ if [ $NMEM_AERO -gt 0 ]; then
 	else
 	   cntl_tracer=${cntldir}/${tracer_reduced_prefix}.tile${itile}.nc
         fi
-
 	ensm_tracer=${ensmdir}/${tracer_prefix}.tile${itile}.nc
 	mem_tracer=${memdir}/${tracer_prefix}.tile${itile}.nc
 	mem_tracer1=${memdir}/${tracer_prefix}.tile${itile}.nc_beforeRecenter
-
-	$NCP ${mem_tracer} ${mem_tracer1}
-
-cat << EOF > recenter_aeros.nl
-&recenter_aeros_nml
- fnamecntl = "${cntl_tracer}"
- fnameensm = "${ensm_tracer}"
- fnamemem = "${mem_tracer}"
- varnames =  "sulf","bc1","bc2","oc1","oc2","dust1","dust2","dust3","dust4","dust5","seas1","seas2","seas3","seas4","seas5"
-/ 
-EOF
-
-	mpirun -np 1 ${RECENTEREXEC}
-
-	err=$?
-
-	if  [ $err -ne 0 ]; then
-    	    echo "RecenterAeros run failed and exit the program!!!"
-    	    exit $err
-	else
-    	    /bin/rm -r recenter_aeros.nl
-	fi
-
+	mem_tracer2=${memdir}/${tracer_prefix}.tile${itile}.nc_tmp
+	$NMV ${mem_tracer} ${mem_tracer1}
+	ncdiff -v ${vars_recenter} ${mem_tracer1} ${ensm_tracer} ${mem_tracer2}
+	ncbo --op_typ=add -v ${vars_recenter} ${mem_tracer2} ${cntl_tracer} ${mem_tracer}
+	ncks -A -v ${vars_append} ${mem_tracer1} ${mem_tracer}
+	/bin/rm -rf ${mem_tracer2}
     done
+    err=$?
   done
 fi
 fi

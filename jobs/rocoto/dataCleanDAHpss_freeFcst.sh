@@ -33,7 +33,7 @@ mkdir -p ${hpssTmp}
 cat > ${hpssTmp}/job_hpss_${CDATE}.sh << EOF
 #!/bin/bash --login
 #SBATCH -J hpss-${CDATE}
-#SBATCH -A chem-var
+#SBATCH -A ${HPSS_ACCOUNT}
 #SBATCH -n 1
 #SBATCH -t 24:00:00
 #SBATCH -p service
@@ -95,6 +95,7 @@ if [ -s \${cntlGDAS} ]; then
     /bin/cp \${cntlGDAS}/RESTART/*.fv_core.* \${cntlBakup}/
 #    /bin/cp \${cntlGDAS}/obs/* \${cntlBakup}/
     /bin/cp \${cntlGDAS}/RESTART/\${cyc1prefix}.fv_tracer.* \${cntlBakup}/
+    /bin/cp \${cntlGDAS}/RESTART/\${cyc1prefix}.coupler.res.ges	 \${cntlBakup}/
 
     if [ \$? != '0' ]; then
        echo "Copy Control gdas.\${cycYMD}\${cycH} failed and exit at error code \$?"
@@ -117,9 +118,10 @@ if [ -s \${cntlGDAS} ]; then
     /bin/cp \${enkfGDAS_Mean}/RESTART/*.fv_core.* \${enkfBakup_Mean}/
 #    /bin/cp \${enkfGDAS_Mean}/obs/* \${enkfBakup_Mean}/
     /bin/cp \${enkfGDAS_Mean}/RESTART/\${cyc1prefix}.fv_tracer.* \${enkfBakup_Mean}/
+    /bin/cp \${enkfGDAS_Mean}/RESTART/\${cyc1prefix}.coupler.res.ges	\${enkfBakup_Mean}/
 
     ianal=1
-    while [ \${ianal} -le \${nanal} ]; do
+    while [ \${ianal} -le 0 ]; do
        memStr=mem\`printf %03i \$ianal\`
 
        enkfGDAS_Mem=\${dataDir}/enkfgdas.\${cycYMD}/\${cycH}/\${memStr}

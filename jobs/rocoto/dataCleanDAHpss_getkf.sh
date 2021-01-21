@@ -82,25 +82,25 @@ if [ -s \${cntlGDAS} ]; then
 ### Copy the logfiles
     /bin/cp -r \${logDir}/\${cycN} \${cntlGDAS}/\${cycN}_log
 
-### Clean unnecessary cntl files
-    #/bin/rm -rf \${cntlGDAS}/gdas.t??z.atmf???.nc
-    #/bin/rm -rf \${cntlGDAS}/gdas.t??z.sfcf???.nc
-    /bin/rm -rf \${cntlGDAS}/gdas.t??z.logf???.txt
+#### Clean unnecessary cntl files
+#    #/bin/rm -rf \${cntlGDAS}/gdas.t??z.atmf???.nc
+#    #/bin/rm -rf \${cntlGDAS}/gdas.t??z.sfcf???.nc
+#    /bin/rm -rf \${cntlGDAS}/gdas.t??z.logf???.txt
     /bin/rm -rf \${cntlGDAS}/fireemi
-
-#### Backup cntl data
-    cntlBakup=\${bakupDir}/gdas.\${cycYMD}/\${cycH}/
-    mkdir -p \${cntlBakup}/obs
-    /bin/cp \${cntlGDAS}/obs/*					\${cntlBakup}/obs/
-    /bin/cp \${cntlGDAS}/RESTART/\${cyc1prefix}.fv_tracer* 	\${cntlBakup}/
-    /bin/cp \${cntlGDAS}/RESTART/\${cyc1prefix}.fv_core* 	\${cntlBakup}/
-    /bin/cp \${cntlGDAS}/RESTART/\${cyc1prefix}.fv_aod* 	\${cntlBakup}/
-    /bin/cp \${cntlGDAS}/RESTART/\${cyc1prefix}.coupler.res.ges \${cntlBakup}/
-
-    if [ \$? != '0' ]; then
-       echo "Copy Control gdas.\${cycYMD}\${cycH} failed and exit at error code \$?"
-       exit \$?
-    fi
+#
+##### Backup cntl data
+#    cntlBakup=\${bakupDir}/gdas.\${cycYMD}/\${cycH}/
+#    mkdir -p \${cntlBakup}/obs
+#    /bin/cp \${cntlGDAS}/obs/*					\${cntlBakup}/obs/
+#    /bin/cp \${cntlGDAS}/RESTART/\${cyc1prefix}.fv_tracer* 	\${cntlBakup}/
+#    /bin/cp \${cntlGDAS}/RESTART/\${cyc1prefix}.fv_core* 	\${cntlBakup}/
+#    /bin/cp \${cntlGDAS}/RESTART/\${cyc1prefix}.fv_aod* 	\${cntlBakup}/
+#    /bin/cp \${cntlGDAS}/RESTART/\${cyc1prefix}.coupler.res.ges \${cntlBakup}/
+#
+#    if [ \$? != '0' ]; then
+#       echo "Copy Control gdas.\${cycYMD}\${cycH} failed and exit at error code \$?"
+#       exit \$?
+#    fi
     
 
 ### Start EnKF
@@ -150,18 +150,18 @@ if [ -s \${cntlGDAS} ]; then
        exit \$?
     fi
 
-    #htar -cv -f \${hpssExpDir}/gdas.\${cycN}.tar \${cntlGDAS}
-    cd \${cntlGDAS}
-    htar -cv -f \${hpssExpDir}/gdas.\${cycN}.tar *
-    #hsi ls -l \${hpssExpDir}/gdas.\${cycN}.tar
-    stat=\$?
-    if [ \${stat} != '0' ]; then
-       echo "HTAR failed at gdas.\${cycN}  and exit at error code \${stat}"
-	exit \${stat}
-    else
-       echo "HTAR at gdas.\${cycN} completed !"
-       /bin/rm -rf  \${cntlGDAS}   #./gdas.\${cycN}
-    fi
+#    #htar -cv -f \${hpssExpDir}/gdas.\${cycN}.tar \${cntlGDAS}
+#    cd \${cntlGDAS}
+#    htar -cv -f \${hpssExpDir}/gdas.\${cycN}.tar *
+#    #hsi ls -l \${hpssExpDir}/gdas.\${cycN}.tar
+#    stat=\$?
+#    if [ \${stat} != '0' ]; then
+#       echo "HTAR failed at gdas.\${cycN}  and exit at error code \${stat}"
+#	exit \${stat}
+#    else
+#       echo "HTAR at gdas.\${cycN} completed !"
+#       /bin/rm -rf  \${cntlGDAS}   #./gdas.\${cycN}
+#    fi
 
     #htar -cv -f \${hpssExpDir}/enkfgdas.\${cycN}.tar \${enkfGDAS}
     cd \${enkfGDAS}

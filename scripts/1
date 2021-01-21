@@ -1112,9 +1112,9 @@ if [ $SEND = "YES" ]; then
   if [ $CDUMP = "gdas" -a $restart_interval -gt 0 ]; then
     cd $DATA/RESTART
     mkdir -p $memdir/RESTART
-    #$NMV * $memdir/RESTART/
+    $NMV * $memdir/RESTART/
     
-    if [ "YES" = "YES" ]; then
+    if [ "YES" = "NO" ]; then
     if [ $FGAT3D = "TRUE" -a ${FGAT3D_onlyCenter} != "TRUE" ]; then
     #RDATE=$($NDATE +$restart_interval $CDATE)
     RDATE=$($NDATE +$assim_freq $CDATE)

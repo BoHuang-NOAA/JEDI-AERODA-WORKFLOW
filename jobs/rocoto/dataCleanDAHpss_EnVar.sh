@@ -79,10 +79,10 @@ cyc1prefix=\${cyc1YMD}.\${cyc1H}0000
 cntlGDAS=\${dataDir}/gdas.\${cycYMD}/\${cycH}/
 
 if [ -s \${cntlGDAS} ]; then
-### Copy the logfiles
+#### Copy the logfiles
     /bin/cp -r \${logDir}/\${cycN} \${cntlGDAS}/\${cycN}_log
 
-### Clean unnecessary cntl files
+#### Clean unnecessary cntl files
     #/bin/rm -rf \${cntlGDAS}/gdas.t??z.atmf???.nc
     #/bin/rm -rf \${cntlGDAS}/gdas.t??z.sfcf???.nc
     /bin/rm -rf \${cntlGDAS}/gdas.t??z.logf???.txt
@@ -90,11 +90,12 @@ if [ -s \${cntlGDAS} ]; then
 
 #### Backup cntl data
     cntlBakup=\${bakupDir}/gdas.\${cycYMD}/\${cycH}/
-    mkdir -p \${cntlBakup}/obs
-    /bin/cp \${cntlGDAS}/obs/*					\${cntlBakup}/obs/
-    /bin/cp \${cntlGDAS}/RESTART/\${cyc1prefix}.fv_tracer* 	\${cntlBakup}/
-    /bin/cp \${cntlGDAS}/RESTART/\${cyc1prefix}.fv_core* 	\${cntlBakup}/
-    /bin/cp \${cntlGDAS}/RESTART/\${cyc1prefix}.fv_aod* 	\${cntlBakup}/
+    mkdir -p \${cntlBakup}
+    #/bin/cp \${cntlGDAS}/RESTART/*.fv_aod_* \${cntlBakup}/
+    #/bin/cp \${cntlGDAS}/RESTART/*.fv_core.* \${cntlBakup}/
+    #/bin/cp \${cntlGDAS}/obs/* \${cntlBakup}/
+    /bin/cp \${cntlGDAS}/RESTART/\${cyc1prefix}.fv_tracer.* \${cntlBakup}/
+    /bin/cp \${cntlGDAS}/RESTART/\${cyc1prefix}.fv_core.* \${cntlBakup}/
     /bin/cp \${cntlGDAS}/RESTART/\${cyc1prefix}.coupler.res.ges \${cntlBakup}/
 
     if [ \$? != '0' ]; then
@@ -102,53 +103,6 @@ if [ -s \${cntlGDAS} ]; then
        exit \$?
     fi
     
-
-### Start EnKF
-    enkfGDAS=\${dataDir}/enkfgdas.\${cycYMD}/\${cycH}/
-
-### Delite unnecessary ens files
-    /bin/rm -rf \${enkfGDAS}/efcs.grp??
-    /bin/rm -rf \${enkfGDAS}/fireemi
-
-    enkfGDAS_Mean=\${dataDir}/enkfgdas.\${cycYMD}/\${cycH}/ensmean
-    enkfBakup_Mean=\${bakupDir}/enkfgdas.\${cycYMD}/\${cycH}/ensmean
-
-    mkdir -p \${enkfBakup_Mean}/obs
-    /bin/cp \${enkfGDAS_Mean}/obs/*					\${enkfBakup_Mean}/obs/
-    /bin/cp \${enkfGDAS_Mean}/RESTART/\${cyc1prefix}.fv_tracer* 	\${enkfBakup_Mean}/
-    /bin/cp \${enkfGDAS_Mean}/RESTART/\${cyc1prefix}.fv_core* 		\${enkfBakup_Mean}/
-    /bin/cp \${enkfGDAS_Mean}/RESTART/\${cyc1prefix}.fv_aod* 		\${enkfBakup_Mean}/
-    /bin/cp \${enkfGDAS_Mean}/RESTART/\${cyc1prefix}.coupler.res.ges 	\${enkfBakup_Mean}/
-
-    ianal=1
-    while [ \${ianal} -le \${nanal} ]; do
-       memStr=mem\`printf %03i \$ianal\`
-
-       enkfGDAS_Mem=\${dataDir}/enkfgdas.\${cycYMD}/\${cycH}/\${memStr}
-       enkfBakup_Mem=\${bakupDir}/enkfgdas.\${cycYMD}/\${cycH}/\${memStr}
-
-       ### clean uncessary mem files
-       #/bin/rm -r \${enkfGDAS_Mem}/gdas.t??z.atmf???.nc
-       #/bin/rm -r \${enkfGDAS_Mem}/gdas.t??z.sfcf???.nc
-       /bin/rm -r \${enkfGDAS_Mem}/gdas.t??z.logf???.txt
-
-       ### back mem data
-       mkdir -p \${enkfBakup_Mem}/obs
-       /bin/cp \${enkfGDAS_Mem}/obs/* 						\${enkfBakup_Mem}/obs/
-       #/bin/cp \${enkfGDAS_Mem}/obs/* \${enkfBakup_Mem}
-       #/bin/cp \${enkfGDAS_Mem}/RESTART/\${cyc1prefix}.fv_tracer*.ges  	\${enkfBakup_Mem}
-       #/bin/cp \${enkfGDAS_Mem}/RESTART/\${cyc1prefix}.fv_core*.ges    	\${enkfBakup_Mem}
-       #/bin/cp \${enkfGDAS_Mem}/RESTART/\${cyc1prefix}.fv_aod*.ges 		\${enkfBakup_Mem}
-       /bin/cp \${enkfGDAS_Mem}/RESTART/\${cyc1prefix}.coupler.res.ges 	\${enkfBakup_Mem}
-
-       ianal=\$[\$ianal+1]
-
-    done
-
-    if [ \$? != '0' ]; then
-       echo "Copy EnKF enkfgdas.\${cycYMD}\${cycH} failed and exit at error code \$?"
-       exit \$?
-    fi
 
     #htar -cv -f \${hpssExpDir}/gdas.\${cycN}.tar \${cntlGDAS}
     cd \${cntlGDAS}
@@ -163,19 +117,6 @@ if [ -s \${cntlGDAS} ]; then
        /bin/rm -rf  \${cntlGDAS}   #./gdas.\${cycN}
     fi
 
-    #htar -cv -f \${hpssExpDir}/enkfgdas.\${cycN}.tar \${enkfGDAS}
-    cd \${enkfGDAS}
-    htar -cv -f \${hpssExpDir}/enkfgdas.\${cycN}.tar *
-    #hsi ls -l \${hpssExpDir}/enkfgdas.\${cycN}.tar
-    stat=\$?
-    echo \${stat}
-    if [ \${stat} != '0' ]; then
-       echo "HTAR failed at enkfgdas.\${cycN}  and exit at error code \${stat}"
-    	exit \${stat}
-    else
-       echo "HTAR at enkfgdas.\${cycN} completed !"
-       /bin/rm -rf \${enkfGDAS}  #./enkfgdas.\${cycN}
-    fi
 
     cycN=\`\${incdate} \${cycInc}  \${cycN}\`
 fi
